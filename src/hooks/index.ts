@@ -1,2 +1,3 @@
-export * from './useChat';
+export * from './useChatGenerator';
+export * from './useMessageHistories';
 export * from './useModels';

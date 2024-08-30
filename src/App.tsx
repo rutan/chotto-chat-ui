@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useChat, useModels } from './hooks';
+import { useChatGenerator, useMessageHistories, useModels } from './hooks';
 import { ChatForm, ModelSelector } from './components';
 import { Model } from './libs';
 
@@ -8,12 +8,17 @@ const config = { url: 'http://localhost:11434' };
 export const App: React.FC = () => {
   const { models } = useModels(config);
   const [currentModel, setCurrentModel] = useState<Model | null>(null);
+  const { currentHistories, addMessageHistory } = useMessageHistories();
   const {
     loading: chatLoading,
-    messages,
-    sendMessage,
+    generatingMessage,
     abort: cancelChat,
-  } = useChat({ config, model: currentModel?.name ?? '' });
+  } = useChatGenerator({
+    config,
+    model: currentModel?.name ?? '',
+    messageHistories: currentHistories,
+    addMessageHistory,
+  });
 
   const handleModelChange = (model: Model) => {
     setCurrentModel(model);
@@ -23,14 +28,24 @@ export const App: React.FC = () => {
     cancelChat();
   };
 
+  const handleSendMessage = (message: string) => {
+    const userMessage = { role: 'user', content: message } as const;
+    addMessageHistory(userMessage);
+  };
+
   return (
     <div>
       <ModelSelector models={models} onChange={handleModelChange} />
-      {messages.map((message, index) => (
+      {currentHistories.map((history, index) => (
         <div key={index}>
-          {message.role}: {message.content}
+          {history.message.role}: {history.message.content}
         </div>
       ))}
+      {generatingMessage && (
+        <div>
+          {generatingMessage.role}: {generatingMessage.content}
+        </div>
+      )}
       {currentModel &&
         (chatLoading ? (
           <div>
@@ -38,7 +53,7 @@ export const App: React.FC = () => {
             <button onClick={handleCancelChat}>Cancel</button>
           </div>
         ) : (
-          <ChatForm onSend={sendMessage} />
+          <ChatForm onSend={handleSendMessage} />
         ))}
     </div>
   );
