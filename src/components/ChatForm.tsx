@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
+import { MdSend } from 'react-icons/md';
 
 export interface ChatFormProps {
   onSend: (message: string) => void;
@@ -63,9 +64,13 @@ export const ChatForm = ({ onSend, initMessage, isChatting, onCancelChat }: Chat
   }, [isChatting]);
 
   return (
-    <form className="flex bg-pane-weaker-bg rounded" action="#" onSubmit={handleSubmit}>
+    <form
+      className="flex items-center gap-2 bg-surface border border-outline rounded text-on-surface"
+      action="#"
+      onSubmit={handleSubmit}
+    >
       <TextareaAutosize
-        className="flex-grow w-full p-4 bg-transparent"
+        className="flex-grow w-full p-4 bg-transparent resize-none"
         maxRows={5}
         value={message}
         onChange={handleChange}
@@ -86,8 +91,11 @@ export const ChatForm = ({ onSend, initMessage, isChatting, onCancelChat }: Chat
           </button>
         )
       ) : (
-        <button className="px-4" type="submit">
-          Send
+        <button
+          className="flex items-center justify-center shrink-0 w-10 h-10 mr-2 rounded-full bg-primary text-on-primary hover:opacity-80"
+          type="submit"
+        >
+          <MdSend className="w-4 h-4" title="Send Message" />
         </button>
       )}
     </form>

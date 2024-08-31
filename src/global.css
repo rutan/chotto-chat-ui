@@ -3,14 +3,89 @@
 @tailwind utilities;
 
 html {
-  --background-color: #fafafa;
-  --pane-background-color: #fff;
-  --pane-weaker-background-color: #eee;
-  --pane-success-background-color: #f0fff4;
+  --primary-color: #3a693a;
+  --on-primary-color: #fff;
+  --primary-container-color: #bbf0b5;
+  --on-primary-container-color: #002105;
+
+  --secondary-color: #52634f;
+  --on-secondary-color: #fff;
+  --secondary-container-color: #d5e8cf;
+  --on-secondary-container-color: #101f10;
+
+  --tertiary-color: #39656b;
+  --on-tertiary-color: #fff;
+  --tertiary-container-color: #bcebf1;
+  --on-tertiary-container-color: #001f23;
+
+  --error-color: #ba1a1a;
+  --on-error-color: #fff;
+  --error-container-color: #ffdad6;
+  --on-error-container-color: #410002;
+
+  --surface-dim-color: #d8dbd2;
+  --surface-color: #f7fbf1;
+  --surface-bright-color: #f7fbf1;
+  --surface-container-lowest-color: #ffffff;
+  --surface-container-low-color: #f1f5ec;
+  --surface-container-color: #ecefe6;
+  --surface-container-high-color: #e6e9e0;
+  --surface-container-highest-color: #e0e4db;
+  --on-surface-color: #181d17;
+  --on-surface-variant-color: #424940;
+  --outline-color: #72796f;
+  --outline-variant-color: #c2c9bd;
+
+  --inverse-surface-color: #2d322c;
+  --on-inverse-surface-color: #eef2e9;
+  --on-inverse-surface-primary-color: #a0d49b;
+}
+
+html.dark {
+  --primary-color: #a0d49b;
+  --on-primary-color: #083910;
+  --primary-container-color: #225025;
+  --on-primary-container-color: #bbf0b5;
+
+  --secondary-color: #b9ccb4;
+  --on-secondary-color: #253423;
+  --secondary-container-color: #3b4b39;
+  --on-secondary-container-color: #d5e8cf;
+
+  --tertiary-color: #a1ced5;
+  --on-tertiary-color: #00363b;
+  --tertiary-container-color: #1f4d53;
+  --on-tertiary-container-color: #bcebf1;
+
+  --error-color: #ffb4ab;
+  --on-error-color: #690005;
+  --error-container-color: #93000a;
+  --on-error-container-color: #ffdad6;
+
+  --surface-dim-color: #10140f;
+  --surface-color: #10140f;
+  --surface-bright-color: #363a34;
+  --surface-container-lowest-color: #0b0f0a;
+  --surface-container-low-color: #181d17;
+  --surface-container-color: #1c211b;
+  --surface-container-high-color: #272b25;
+  --surface-container-highest-color: #323630;
+  --on-surface-color: #e0e4db;
+  --on-surface-variant-color: #c2c9bd;
+  --outline-color: #8c9388;
+  --outline-variant-color: #424940;
+
+  --inverse-surface-color: #e0e4db;
+  --on-inverse-surface-color: #2d322c;
+  --on-inverse-surface-primary-color: #3a693a;
 }
 
 html,
 body,
 #root {
   height: 100%;
+}
+
+body {
+  background: var(--surface-color);
 }

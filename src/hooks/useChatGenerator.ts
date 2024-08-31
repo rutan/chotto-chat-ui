@@ -41,24 +41,28 @@ export function useChatGenerator({
     abortControllerRef.current = controller;
 
     (async () => {
+      const responseMessage = { role: 'assistant' as const, content: '' };
+
       try {
         const reader = await postChatStream(config, model, messages, {
           signal: controller.signal,
         });
         const decoder = new TextDecoder();
-        const responseMessage = { role: 'assistant' as const, content: '' };
+        setGeneratingMessage({ ...responseMessage });
 
         while (true) {
           const { done, value } = await reader.read();
           if (value) {
             const text = decoder.decode(value);
-            const data = JSON.parse(text);
-            responseMessage.content = `${responseMessage.content}${data.message.content}`;
-            setGeneratingMessage({ ...responseMessage });
+            text.split('\n').forEach((line) => {
+              if (!line) return;
+              const data = JSON.parse(line);
+              responseMessage.content = `${responseMessage.content}${data.message.content}`;
+              setGeneratingMessage({ ...responseMessage });
+            });
           }
 
           if (done) {
-            setLoading(false);
             addMessageHistory(responseMessage);
             break;
           }
@@ -66,6 +70,7 @@ export function useChatGenerator({
       } catch (e) {
         if (e instanceof Error && e.name === 'AbortError') {
           console.log('Request aborted');
+          addMessageHistory(responseMessage);
           return;
         }
         console.error(e);
