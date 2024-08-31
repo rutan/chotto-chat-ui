@@ -27,6 +27,8 @@ export function postChatStream(
     signal?: AbortSignal;
   },
 ) {
+  console.log('send', JSON.stringify(messages, null, 2));
+
   return fetch(`${config.url}/api/chat`, {
     method: 'POST',
     headers: {

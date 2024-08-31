@@ -1,50 +1,63 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { v4 as uuidV4 } from 'uuid';
-import { ChatMessage } from '../libs';
+import { ChatMessage, nonNullableFilter } from '../libs';
 
 export interface MessageHistory {
   id: string;
   message: ChatMessage;
-  activeNextIndex?: number;
-  nextIndexes: number[];
+  activeNextId?: string;
+  nextIds: string[];
 }
 
-function seekMessageIndex(messageHistories: MessageHistory[], seekIndex: number): number[] {
-  const messageHistory = messageHistories[seekIndex];
+function seekMessageIds(messageHistories: MessageHistory[], seedId: string): string[] {
+  const messageHistory = messageHistories.find((history) => history.id === seedId);
   if (!messageHistory) return [];
 
-  const activeNextIndex = messageHistory.activeNextIndex;
-  if (activeNextIndex === undefined) return [seekIndex];
+  const activeNextIndex = messageHistory.activeNextId;
+  if (activeNextIndex === undefined) return [seedId];
 
-  return [seekIndex, ...seekMessageIndex(messageHistories, activeNextIndex)];
+  return [seedId, ...seekMessageIds(messageHistories, activeNextIndex)];
 }
 
 export function useMessageHistories() {
-  const [messageHistories, setMessageHistories] = useState<MessageHistory[]>([]);
+  const [systemPrompt, setSystemPrompt] = useState('You are Assistant bot.');
+  const [messageHistories, setMessageHistories] = useState<MessageHistory[]>([
+    {
+      id: uuidV4(),
+      message: { role: 'system', content: systemPrompt },
+      nextIds: [],
+    },
+  ]);
 
-  const messageIndexes = useMemo(() => {
-    return seekMessageIndex(messageHistories, 0);
+  const messageIds = useMemo(() => {
+    return seekMessageIds(messageHistories, messageHistories[0]?.id ?? '');
   }, [messageHistories]);
 
   const currentHistories = useMemo(() => {
-    return messageIndexes.map((index) => messageHistories[index]);
-  }, [messageIndexes]);
+    return messageIds.map((id) => messageHistories.find((history) => history.id === id)).filter(nonNullableFilter);
+  }, [messageIds]);
 
-  const addMessageHistory = useCallback((message: ChatMessage) => {
+  const addNewMessageHistory = useCallback((message: ChatMessage) => {
     setMessageHistories((prev) => {
       const newHistories = prev.slice();
-      const messageIndexes = seekMessageIndex(newHistories, 0);
-      const lastIndex = messageIndexes[messageIndexes.length - 1];
-      newHistories.push({
+      if (newHistories.length === 0) throw new Error('System message not found');
+
+      const messageIds = seekMessageIds(newHistories, newHistories[0].id);
+      const lastMessageId = messageIds[messageIds.length - 1];
+      const lastMessageIndex = newHistories.findIndex((history) => history.id === lastMessageId);
+
+      const newHistory = {
         id: uuidV4(),
         message,
-        nextIndexes: [],
-      });
-      if (lastIndex !== undefined) {
-        newHistories[lastIndex] = {
-          ...newHistories[lastIndex],
-          nextIndexes: [...newHistories[lastIndex].nextIndexes, newHistories.length - 1],
-          activeNextIndex: newHistories.length - 1,
+        nextIds: [],
+      };
+      newHistories.push(newHistory);
+
+      if (lastMessageIndex !== -1) {
+        newHistories[lastMessageIndex] = {
+          ...newHistories[lastMessageIndex],
+          activeNextId: newHistory.id,
+          nextIds: [...newHistories[lastMessageIndex].nextIds, newHistory.id],
         };
       }
 
@@ -52,9 +65,66 @@ export function useMessageHistories() {
     });
   }, []);
 
+  const addBranchMessageHistory = useCallback((targetHistory: MessageHistory, message: ChatMessage) => {
+    setMessageHistories((prev) => {
+      const newHistories = prev.slice();
+      const targetIndex = newHistories.findIndex((history) => history.id === targetHistory.id);
+      if (targetIndex === -1) throw new Error('Invalid target history');
+
+      const newHistory = {
+        id: uuidV4(),
+        message,
+        nextIds: [],
+      };
+      newHistories.push(newHistory);
+
+      newHistories[targetIndex] = {
+        ...newHistories[targetIndex],
+        activeNextId: newHistory.id,
+        nextIds: [...newHistories[targetIndex].nextIds, newHistory.id],
+      };
+
+      return newHistories;
+    });
+  }, []);
+
+  const changeBranchMessageHistory = useCallback((targetHistory: MessageHistory, newNextId?: string) => {
+    if (newNextId && !targetHistory.nextIds.includes(newNextId)) throw new Error('Invalid nextId');
+
+    setMessageHistories((prev) => {
+      const newHistories = prev.slice();
+      const targetIndex = newHistories.findIndex((history) => history.id === targetHistory.id);
+      if (targetIndex === -1) throw new Error('Invalid target history');
+
+      newHistories[targetIndex] = {
+        ...newHistories[targetIndex],
+        activeNextId: newNextId,
+      };
+
+      return newHistories;
+    });
+  }, []);
+
+  useEffect(() => {
+    setMessageHistories((prev) => {
+      const systemMessage = prev.find((history) => history.message.role === 'system');
+      if (!systemMessage) throw new Error('System message not found');
+
+      return [
+        {
+          ...systemMessage,
+          message: { role: 'system', content: systemPrompt },
+        },
+        ...prev.filter((history) => history.message.role !== 'system'),
+      ];
+    });
+  }, [systemPrompt]);
+
   return {
     messageHistories,
     currentHistories,
-    addMessageHistory,
+    addNewMessageHistory,
+    addBranchMessageHistory,
+    changeBranchMessageHistory,
   };
 }

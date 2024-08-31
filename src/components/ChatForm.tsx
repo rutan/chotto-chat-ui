@@ -3,12 +3,13 @@ import TextareaAutosize from 'react-textarea-autosize';
 
 export interface ChatFormProps {
   onSend: (message: string) => void;
+  initMessage?: string;
   isChatting?: boolean;
   onCancelChat?: () => void;
 }
 
-export const ChatForm = ({ onSend, isChatting, onCancelChat }: ChatFormProps) => {
-  const [message, setMessage] = useState('');
+export const ChatForm = ({ onSend, initMessage, isChatting, onCancelChat }: ChatFormProps) => {
+  const [message, setMessage] = useState(initMessage ?? '');
   const [isComposing, setIsComposing] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
@@ -75,7 +76,9 @@ export const ChatForm = ({ onSend, isChatting, onCancelChat }: ChatFormProps) =>
         disabled={isChatting}
         placeholder="Type a message..."
         ref={textareaRef}
-      />
+      >
+        {message}
+      </TextareaAutosize>
       {isChatting ? (
         onCancelChat && (
           <button className="px-4" type="button" onClick={onCancelChat}>

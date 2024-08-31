@@ -1,11 +1,137 @@
-import React from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { MessageHistory } from '../hooks';
 import { ChatMessageBody } from './ChatMessageBody';
+import { MdEdit, MdChevronLeft, MdChevronRight } from 'react-icons/md';
+import { ChatForm } from './ChatForm';
 
 export interface ChatMessageHistoryBalloonProps {
   messageHistory: MessageHistory;
+  parentMessageHistory?: MessageHistory;
+  onSendNewBranch?: (parentHistory: MessageHistory, message: string) => void;
+  onChangeBranch?: (parentHistory: MessageHistory, nextId?: string) => void;
+  disabled?: boolean;
 }
 
-export const ChatMessageHistoryBalloon = ({ messageHistory }: ChatMessageHistoryBalloonProps) => {
-  return <ChatMessageBody message={messageHistory.message}></ChatMessageBody>;
+const FooterMenuButton = ({
+  children,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { children: React.ReactNode }) => {
+  return (
+    <button className="flex items-center gap-1 text-sm disabled:opacity-20" {...props}>
+      {children}
+    </button>
+  );
+};
+
+const ChangeBranchButton = ({
+  children,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { children: React.ReactNode }) => {
+  return (
+    <button className="flex justify-center items-center w-6 h-6 disabled:opacity-20" {...props}>
+      {children}
+    </button>
+  );
+};
+
+export const ChatMessageHistoryBalloon = ({
+  messageHistory,
+  parentMessageHistory,
+  onSendNewBranch,
+  onChangeBranch,
+  disabled,
+}: ChatMessageHistoryBalloonProps) => {
+  const [isEdit, setIsEdit] = useState(false);
+
+  const handleClickEdit = useCallback(() => {
+    setIsEdit(true);
+  }, []);
+
+  const handleClickCancelEdit = useCallback(() => {
+    setIsEdit(false);
+  }, []);
+
+  const handleSendMessage = useCallback(
+    (message: string) => {
+      setIsEdit(false);
+      if (parentMessageHistory && onSendNewBranch) {
+        onSendNewBranch(parentMessageHistory, message);
+      }
+    },
+    [parentMessageHistory, onSendNewBranch],
+  );
+
+  const handleChangeBranch = useCallback(
+    (isNext: boolean) => {
+      if (!parentMessageHistory) return;
+      if (!onChangeBranch) return;
+
+      const currentIndex = parentMessageHistory.nextIds.findIndex((id) => id === messageHistory.id);
+      if (currentIndex === -1) return;
+
+      const nextIndex = isNext ? currentIndex + 1 : currentIndex - 1;
+      const nextId = parentMessageHistory.nextIds[nextIndex];
+      if (!nextId) return;
+
+      onChangeBranch(parentMessageHistory, nextId);
+    },
+    [parentMessageHistory, onChangeBranch],
+  );
+
+  const handleChangePrevBranch = useCallback(() => {
+    handleChangeBranch(false);
+  }, [handleChangeBranch]);
+
+  const handleChangeNextBranch = useCallback(() => {
+    handleChangeBranch(true);
+  }, [handleChangeBranch]);
+
+  const currentBranchIndex = useMemo(() => {
+    if (!parentMessageHistory) return 0;
+
+    const nextIndex = parentMessageHistory.nextIds.findIndex((index) => index === messageHistory.id);
+    return nextIndex === -1 ? 0 : nextIndex;
+  }, [messageHistory, parentMessageHistory]);
+
+  const maxBranchIndex = useMemo(() => {
+    return parentMessageHistory?.nextIds?.length ?? 0;
+  }, [parentMessageHistory]);
+
+  if (messageHistory.message.role === 'system') return null;
+
+  if (isEdit && !disabled) {
+    return (
+      <div>
+        <ChatForm initMessage={messageHistory.message.content} onSend={handleSendMessage} />
+        <button onClick={handleClickCancelEdit} disabled={disabled}>
+          cancel
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <ChatMessageBody message={messageHistory.message}>
+      <div className="flex justify-between">
+        {messageHistory.message.role === 'user' && onSendNewBranch && (
+          <FooterMenuButton onClick={handleClickEdit} disabled={disabled}>
+            <MdEdit title="Edit" />
+          </FooterMenuButton>
+        )}
+        {maxBranchIndex > 1 && (
+          <div className="flex items-center text-sm">
+            <ChangeBranchButton onClick={handleChangePrevBranch} disabled={disabled}>
+              <MdChevronLeft title="prev" />
+            </ChangeBranchButton>
+            <span>
+              {currentBranchIndex + 1} / {maxBranchIndex}
+            </span>
+            <ChangeBranchButton onClick={handleChangeNextBranch} disabled={disabled}>
+              <MdChevronRight title="next" />
+            </ChangeBranchButton>
+          </div>
+        )}
+      </div>
+    </ChatMessageBody>
+  );
 };

@@ -39,7 +39,7 @@
     "prettier": "^3.1.0",
     "rimraf": "^5.0.5",
     "tailwindcss": "^3.4.10",
-    "typescript": "^5.3.2",
+    "typescript": "^5.5.4",
     "vite": "^5.0.4"
   },
   "packageManager": "pnpm@8.15.8+sha256.691fe176eea9a8a80df20e4976f3dfb44a04841ceb885638fe2a26174f81e65e"
