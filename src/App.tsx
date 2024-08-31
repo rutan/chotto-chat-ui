@@ -40,6 +40,7 @@ export const App: React.FC = () => {
   return (
     <>
       <Header
+        selectedModel={currentModel}
         models={models}
         onChangeModel={setCurrentModel}
         systemPrompt={systemPrompt}
