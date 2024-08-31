@@ -3,6 +3,7 @@ import { MessageHistory } from '../hooks';
 import { ChatMessageBody } from './ChatMessageBody';
 import { MdEdit, MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { ChatForm } from './ChatForm';
+import { isElementInViewport } from '../libs';
 
 export interface ChatMessageHistoryBalloonProps {
   messageHistory: MessageHistory;
@@ -46,7 +47,8 @@ export const ChatMessageHistoryBalloon = ({
 
   const handleClickEdit = useCallback(() => {
     setIsEdit(true);
-    if (containerRef.current) {
+
+    if (containerRef.current && !isElementInViewport(containerRef.current)) {
       containerRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, []);

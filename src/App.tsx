@@ -1,8 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { MessageHistory, useChatGenerator, useDarkMode, useMessageHistories, useModels } from './hooks';
-import { ChatForm, ChatMessageHistoryBalloon, ChatGeneratingMessageBalloon, ModelSelector } from './components';
+import {
+  ChatForm,
+  ChatMessageHistoryBalloon,
+  ChatGeneratingMessageBalloon,
+  ModelSelector,
+  SystemPromptDialog,
+} from './components';
 import { Model } from './libs';
-import { MdLightMode, MdDarkMode } from 'react-icons/md';
+import { MdSettings, MdLightMode, MdDarkMode } from 'react-icons/md';
 
 const config = { url: 'http://localhost:11434' };
 
@@ -10,8 +16,14 @@ export const App: React.FC = () => {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const { models } = useModels(config);
   const [currentModel, setCurrentModel] = useState<Model | null>(null);
-  const { currentHistories, addNewMessageHistory, addBranchMessageHistory, changeBranchMessageHistory } =
-    useMessageHistories();
+  const {
+    systemPrompt,
+    setSystemPrompt,
+    currentHistories,
+    addNewMessageHistory,
+    addBranchMessageHistory,
+    changeBranchMessageHistory,
+  } = useMessageHistories();
   const {
     loading: chatLoading,
     generatingMessage,
@@ -23,6 +35,7 @@ export const App: React.FC = () => {
     addMessageHistory: addNewMessageHistory,
   });
   const [isReservedScroll, setIsReservedScroll] = useState(false);
+  const [isShowSystemPrompt, setIsShowSystemPrompt] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const doScrollToBottom = useCallback(() => {
@@ -39,6 +52,19 @@ export const App: React.FC = () => {
   const handleModelChange = (model: Model | null) => {
     setCurrentModel(model);
   };
+
+  const handleOpenPrompt = useCallback(() => {
+    setIsShowSystemPrompt(true);
+  }, []);
+
+  const handleSubmitPrompt = useCallback((newSystemPrompt: string) => {
+    setSystemPrompt(newSystemPrompt);
+    setIsShowSystemPrompt(false);
+  }, []);
+
+  const handleCancelPrompt = useCallback(() => {
+    setIsShowSystemPrompt(false);
+  }, []);
 
   const handleCancelChat = () => {
     cancelChat();
@@ -73,18 +99,29 @@ export const App: React.FC = () => {
   return (
     <>
       <div className="fixed left-0 top-0 w-full h-12 bg-surface-container shadow-md">
-        <div className="max-w-3xl h-full mx-auto flex items-center justify-between">
-          <ModelSelector models={models} onChange={handleModelChange} disabled={chatLoading} />
-          <button
-            className="flex items-center justify-center w-10 h-10 bg-tertiary text-on-primary rounded hover:opacity-80"
-            onClick={handleSwitchDarkMode}
-          >
-            {isDarkMode ? (
-              <MdDarkMode className="w-6 h-6" title="Change to light mode" />
-            ) : (
-              <MdLightMode className="w-6 h-6" title="Change to dark mode" />
-            )}
-          </button>
+        <div className="max-w-3xl h-full mx-auto flex items-center justify-between overflow-x-auto">
+          <div className="flex gap-2">
+            <ModelSelector className="max-w-64" models={models} onChange={handleModelChange} disabled={chatLoading} />
+          </div>
+          <div className="flex gap-2">
+            <button
+              className="flex items-center justify-center w-10 h-10 bg-secondary text-on-primary rounded hover:opacity-80"
+              onClick={handleOpenPrompt}
+              disabled={chatLoading}
+            >
+              <MdSettings className="w-6 h-6" title="Settings" />
+            </button>
+            <button
+              className="flex items-center justify-center w-10 h-10 bg-tertiary text-on-primary rounded hover:opacity-80"
+              onClick={handleSwitchDarkMode}
+            >
+              {isDarkMode ? (
+                <MdDarkMode className="w-6 h-6" title="Change to light mode" />
+              ) : (
+                <MdLightMode className="w-6 h-6" title="Change to dark mode" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
       <div className="flex flex-col h-full pt-12">
@@ -111,6 +148,12 @@ export const App: React.FC = () => {
           </div>
         )}
       </div>
+      <SystemPromptDialog
+        isOpen={isShowSystemPrompt}
+        systemPrompt={systemPrompt}
+        onSubmit={handleSubmitPrompt}
+        onCancel={handleCancelPrompt}
+      />
     </>
   );
 };

@@ -1,19 +1,23 @@
 import React from 'react';
 import { Select } from '@headlessui/react';
-import { Model } from '../libs';
+import { cx, Model } from '../libs';
 
 export interface ModelSelectorProps {
   models: Model[];
   onChange: (model: Model | null) => void;
+  className?: string;
   disabled?: boolean;
 }
 
-export const ModelSelector = ({ models, disabled, onChange }: ModelSelectorProps) => {
+export const ModelSelector = ({ models, className, disabled, onChange }: ModelSelectorProps) => {
   return (
     <Select
       name="model"
       aria-label="use models"
-      className="h-10 px-2 bg-surface-bright text-on-surface border border-outline rounded disabled:opacity-20"
+      className={cx(
+        'h-10 px-2 bg-surface-bright text-on-surface border border-outline rounded disabled:opacity-20',
+        className,
+      )}
       onChange={(e) => {
         const model = models.find((model) => model.name === e.target.value);
         onChange(model ?? null);

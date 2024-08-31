@@ -121,6 +121,8 @@ export function useMessageHistories() {
   }, [systemPrompt]);
 
   return {
+    systemPrompt,
+    setSystemPrompt,
     messageHistories,
     currentHistories,
     addNewMessageHistory,
