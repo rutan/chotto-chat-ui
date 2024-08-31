@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  --background-color: #fafafa;
+  --pane-background-color: #fff;
+  --pane-weaker-background-color: #eee;
+  --pane-success-background-color: #f0fff4;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useChatGenerator, useMessageHistories, useModels } from './hooks';
-import { ChatForm, ModelSelector } from './components';
+import { ChatForm, ChatMessageHistoryBalloon, ChatGeneratingMessageBalloon, ModelSelector } from './components';
 import { Model } from './libs';
 
 const config = { url: 'http://localhost:11434' };
@@ -20,7 +20,7 @@ export const App: React.FC = () => {
     addMessageHistory,
   });
 
-  const handleModelChange = (model: Model) => {
+  const handleModelChange = (model: Model | null) => {
     setCurrentModel(model);
   };
 
@@ -34,27 +34,29 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div>
-      <ModelSelector models={models} onChange={handleModelChange} />
-      {currentHistories.map((history, index) => (
-        <div key={index}>
-          {history.message.role}: {history.message.content}
+    <>
+      <div className="fixed left-0 top-0 w-full h-12 bg-pane-bg shadow-md">
+        <div className="max-w-3xl h-full mx-auto flex items-center">
+          <ModelSelector models={models} onChange={handleModelChange} />
         </div>
-      ))}
-      {generatingMessage && (
-        <div>
-          {generatingMessage.role}: {generatingMessage.content}
-        </div>
-      )}
-      {currentModel &&
-        (chatLoading ? (
-          <div>
-            <p>Loading...</p>
-            <button onClick={handleCancelChat}>Cancel</button>
+      </div>
+      <div className="flex flex-col h-full pt-12">
+        <div className="grow overflow-y-auto">
+          <div className="max-w-3xl mx-auto my-8 px-2 flex flex-col gap-4">
+            {currentHistories.map((history, index) => (
+              <ChatMessageHistoryBalloon key={index} messageHistory={history} />
+            ))}
+            {generatingMessage && <ChatGeneratingMessageBalloon message={generatingMessage} />}
           </div>
-        ) : (
-          <ChatForm onSend={handleSendMessage} />
-        ))}
-    </div>
+        </div>
+        {currentModel && (
+          <div className="w-full bg-pane-bg shadow-md p-2">
+            <div className="max-w-3xl px-2 mx-auto">
+              <ChatForm onSend={handleSendMessage} isChatting={chatLoading} onCancelChat={handleCancelChat} />
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };

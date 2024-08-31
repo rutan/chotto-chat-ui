@@ -4,7 +4,7 @@ import { Model } from '../libs';
 
 export interface ModelSelectorProps {
   models: Model[];
-  onChange: (model: Model) => void;
+  onChange: (model: Model | null) => void;
 }
 
 export const ModelSelector = ({ models, onChange }: ModelSelectorProps) => {
@@ -20,11 +20,10 @@ export const ModelSelector = ({ models, onChange }: ModelSelectorProps) => {
     <Select
       name="model"
       aria-label="use models"
+      className="h-10 px-2 border"
       onChange={(e) => {
         const model = models.find((model) => model.name === e.target.value);
-        if (model) {
-          onChange(model);
-        }
+        onChange(model ?? null);
       }}
     >
       <option>Select Model</option>
