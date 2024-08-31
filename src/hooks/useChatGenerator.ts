@@ -42,13 +42,14 @@ export function useChatGenerator({
 
     (async () => {
       const responseMessage = { role: 'assistant' as const, content: '' };
+      setGeneratingMessage({ ...responseMessage });
 
       try {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         const reader = await postChatStream(config, model, messages, {
           signal: controller.signal,
         });
         const decoder = new TextDecoder();
-        setGeneratingMessage({ ...responseMessage });
 
         while (true) {
           const { done, value } = await reader.read();

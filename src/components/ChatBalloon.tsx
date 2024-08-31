@@ -6,7 +6,8 @@ import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ChatMessage, cx } from '../libs';
 import { MdPerson, MdSmartToy } from 'react-icons/md';
 
-export interface ChatGeneratingBodyProps {
+export interface ChatBalloonProps {
+  className?: string;
   message: ChatMessage;
   children?: React.ReactNode;
 }
@@ -34,9 +35,11 @@ const MarkdownComponents: Components = {
 
 const remarkPlugins = [remarkBreaks];
 
-export const ChatMessageBody = ({ message, children }: ChatGeneratingBodyProps) => {
+export const ChatBalloon = ({ className, message, children }: ChatBalloonProps) => {
   return (
-    <div className={cx('flex gap-2', message.role === 'user' ? 'flex-row-reverse' : 'flex-row')}>
+    <div
+      className={cx('ChatBalloon', 'flex gap-2', message.role === 'user' ? 'flex-row-reverse' : 'flex-row', className)}
+    >
       <div className="flex flex-shrink-0 items-center justify-center w-12 h-12 mt-2 bg-secondary text-on-secondary rounded-full">
         {message.role === 'user' ? (
           <MdPerson className="w-8 h-8 m-auto" title="User" />

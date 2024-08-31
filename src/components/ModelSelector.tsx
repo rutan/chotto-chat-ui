@@ -15,6 +15,7 @@ export const ModelSelector = ({ models, className, disabled, onChange }: ModelSe
       name="model"
       aria-label="use models"
       className={cx(
+        'ModelSelector',
         'h-10 px-2 bg-surface-bright text-on-surface border border-outline rounded disabled:opacity-20',
         className,
       )}

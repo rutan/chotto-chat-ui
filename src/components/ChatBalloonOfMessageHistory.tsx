@@ -1,11 +1,11 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { MessageHistory } from '../hooks';
-import { ChatMessageBody } from './ChatMessageBody';
+import { ChatBalloon } from './ChatBalloon';
 import { MdEdit, MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { ChatForm } from './ChatForm';
 import { isElementInViewport } from '../libs';
 
-export interface ChatMessageHistoryBalloonProps {
+export interface ChatBalloonOfMessageHistoryProps {
   messageHistory: MessageHistory;
   parentMessageHistory?: MessageHistory;
   onSendNewBranch?: (parentHistory: MessageHistory, message: string) => void;
@@ -35,13 +35,13 @@ const ChangeBranchButton = ({
   );
 };
 
-export const ChatMessageHistoryBalloon = ({
+export const ChatBalloonOfMessageHistory = ({
   messageHistory,
   parentMessageHistory,
   onSendNewBranch,
   onChangeBranch,
   disabled,
-}: ChatMessageHistoryBalloonProps) => {
+}: ChatBalloonOfMessageHistoryProps) => {
   const [isEdit, setIsEdit] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -115,7 +115,7 @@ export const ChatMessageHistoryBalloon = ({
           </button>
         </>
       ) : (
-        <ChatMessageBody message={messageHistory.message}>
+        <ChatBalloon message={messageHistory.message}>
           <div className="flex justify-between">
             {messageHistory.message.role === 'user' && onSendNewBranch && (
               <FooterMenuButton onClick={handleClickEdit} disabled={disabled}>
@@ -136,7 +136,7 @@ export const ChatMessageHistoryBalloon = ({
               </div>
             )}
           </div>
-        </ChatMessageBody>
+        </ChatBalloon>
       )}
     </div>
   );
