@@ -27,7 +27,7 @@ export const SystemPromptDialog = ({
   const handleCancel = useCallback(() => {
     setSystemPrompt(initSystemPrompt);
     onCancel();
-  }, [onCancel]);
+  }, [initSystemPrompt, onCancel]);
 
   useEffect(() => {
     setSystemPrompt(initSystemPrompt);
