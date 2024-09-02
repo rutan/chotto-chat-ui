@@ -42,7 +42,7 @@ export const Header = ({
         <div className="max-w-3xl h-full mx-auto grid grid-cols-[1fr_auto_1fr] items-center justify-between">
           <div className="flex justify-start gap-1">
             <button
-              className="flex items-center justify-center w-10 h-10 bg-secondary text-on-primary rounded hover:opacity-80"
+              className="flex items-center justify-center w-10 h-10 text-on-surface rounded hover:bg-surface-dim"
               onClick={handleOpenSettingModal}
               disabled={disabled}
             >
