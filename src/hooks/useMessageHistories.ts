@@ -105,6 +105,16 @@ export function useMessageHistories() {
     });
   }, []);
 
+  const resetHistories = useCallback(() => {
+    setMessageHistories([
+      {
+        id: uuidV4(),
+        message: { role: 'system', content: systemPrompt },
+        nextIds: [],
+      },
+    ]);
+  }, []);
+
   useEffect(() => {
     setMessageHistories((prev) => {
       const systemMessage = prev.find((history) => history.message.role === 'system');
@@ -128,5 +138,6 @@ export function useMessageHistories() {
     addNewMessageHistory,
     addBranchMessageHistory,
     changeBranchMessageHistory,
+    resetHistories,
   };
 }

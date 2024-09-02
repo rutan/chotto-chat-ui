@@ -15,6 +15,7 @@ export const App: React.FC = () => {
     addNewMessageHistory,
     addBranchMessageHistory,
     changeBranchMessageHistory,
+    resetHistories,
   } = useMessageHistories();
   const {
     loading: chatLoading,
@@ -45,6 +46,7 @@ export const App: React.FC = () => {
         onChangeModel={setCurrentModel}
         systemPrompt={systemPrompt}
         onChangeSystemPrompt={setSystemPrompt}
+        onRemoveHistory={resetHistories}
         disabled={chatLoading}
       />
       <div className="flex flex-col h-full pt-12">

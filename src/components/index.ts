@@ -5,5 +5,6 @@ export * from './ChatBalloonOfMessageHistory';
 export * from './ChatForm';
 export * from './DarkModeButton';
 export * from './Header';
+export * from './HeaderMenu';
 export * from './ModelSelector';
 export * from './SystemPromptDialog';
