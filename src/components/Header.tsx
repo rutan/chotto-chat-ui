@@ -2,8 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { MdSettings } from 'react-icons/md';
 import { cx, Model } from '../libs';
 import { ModelSelector } from './ModelSelector';
-import { DarkModeButton } from './DarkModeButton';
-import { SystemPromptDialog } from './SystemPromptDialog';
+import { SettingDialog } from './SettingDialog';
 import { HeaderMenu } from './HeaderMenu';
 
 export interface HeaderProps {
@@ -27,19 +26,14 @@ export const Header = ({
   onRemoveHistory,
   disabled,
 }: HeaderProps) => {
-  const [isShowSystemPrompt, setIsShowSystemPrompt] = useState(false);
+  const [isShowSettingDialog, setIsShowSettingDialog] = useState(false);
 
-  const handleOpenPrompt = useCallback(() => {
-    setIsShowSystemPrompt(true);
+  const handleOpenSettingModal = useCallback(() => {
+    setIsShowSettingDialog(true);
   }, []);
 
-  const handleSubmitPrompt = useCallback((newSystemPrompt: string) => {
-    onChangeSystemPrompt(newSystemPrompt);
-    setIsShowSystemPrompt(false);
-  }, []);
-
-  const handleCancelPrompt = useCallback(() => {
-    setIsShowSystemPrompt(false);
+  const handleCloseSettingDialog = useCallback(() => {
+    setIsShowSettingDialog(false);
   }, []);
 
   return (
@@ -49,15 +43,11 @@ export const Header = ({
           <div className="flex justify-start gap-1">
             <button
               className="flex items-center justify-center w-10 h-10 bg-secondary text-on-primary rounded hover:opacity-80"
-              onClick={handleOpenPrompt}
+              onClick={handleOpenSettingModal}
               disabled={disabled}
             >
               <MdSettings className="w-6 h-6" title="Settings" />
             </button>
-            <DarkModeButton
-              className="flex items-center justify-center w-10 h-10 bg-tertiary text-on-primary rounded hover:opacity-80"
-              iconClassName="w-6 h-6"
-            />
           </div>
           <div className="flex justify-center h-full p-2 box-border">
             <ModelSelector selectedModel={selectedModel} models={models} onChange={onChangeModel} disabled={disabled} />
@@ -67,11 +57,11 @@ export const Header = ({
           </div>
         </div>
       </div>
-      <SystemPromptDialog
-        isOpen={isShowSystemPrompt}
+      <SettingDialog
+        isOpen={isShowSettingDialog}
         systemPrompt={systemPrompt}
-        onSubmit={handleSubmitPrompt}
-        onCancel={handleCancelPrompt}
+        onChangeSystemPrompt={onChangeSystemPrompt}
+        onClose={handleCloseSettingDialog}
       />
     </>
   );
