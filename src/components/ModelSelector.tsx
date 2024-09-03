@@ -1,7 +1,6 @@
-import React from 'react';
-import { Field, Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/react';
-import { cx, Model } from '../libs';
+import { Field, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
 import { MdArrowDropDown } from 'react-icons/md';
+import { type Model, cx } from '../libs';
 
 export interface ModelSelectorProps {
   selectedModel: Model | null;

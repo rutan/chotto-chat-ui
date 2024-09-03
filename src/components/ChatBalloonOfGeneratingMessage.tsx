@@ -1,5 +1,4 @@
-import React from 'react';
-import { ChatMessage } from '../libs';
+import type { ChatMessage } from '../libs';
 import { ChatBalloon } from './ChatBalloon';
 
 export interface ChatBalloonOfGeneratingMessageProps {

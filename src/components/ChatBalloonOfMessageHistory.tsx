@@ -1,9 +1,9 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { MessageHistory } from '../hooks';
-import { ChatBalloon } from './ChatBalloon';
-import { MdEdit, MdChevronLeft, MdChevronRight } from 'react-icons/md';
-import { ChatForm } from './ChatForm';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { MdChevronLeft, MdChevronRight, MdEdit } from 'react-icons/md';
+import type { MessageHistory } from '../hooks';
 import { isElementInViewport } from '../libs';
+import { ChatBalloon } from './ChatBalloon';
+import { ChatForm } from './ChatForm';
 
 export interface ChatBalloonOfMessageHistoryProps {
   messageHistory: MessageHistory;
@@ -18,7 +18,11 @@ const FooterMenuButton = ({
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children: React.ReactNode }) => {
   return (
-    <button className="flex items-center gap-1 text-sm text-on-surface-variant disabled:opacity-20" {...props}>
+    <button
+      type="button"
+      className="flex items-center gap-1 text-sm text-on-surface-variant disabled:opacity-20"
+      {...props}
+    >
       {children}
     </button>
   );
@@ -29,7 +33,11 @@ const ChangeBranchButton = ({
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children: React.ReactNode }) => {
   return (
-    <button className="flex justify-center items-center w-6 h-6 on-surface-variant disabled:opacity-20" {...props}>
+    <button
+      type="button"
+      className="flex justify-center items-center w-6 h-6 on-surface-variant disabled:opacity-20"
+      {...props}
+    >
       {children}
     </button>
   );
@@ -81,7 +89,7 @@ export const ChatBalloonOfMessageHistory = ({
 
       onChangeBranch(parentMessageHistory, nextId);
     },
-    [parentMessageHistory, onChangeBranch],
+    [messageHistory, parentMessageHistory, onChangeBranch],
   );
 
   const handleChangePrevBranch = useCallback(() => {
@@ -110,7 +118,7 @@ export const ChatBalloonOfMessageHistory = ({
       {isEdit && !disabled ? (
         <>
           <ChatForm initMessage={messageHistory.message.content} onSend={handleSendMessage} />
-          <button onClick={handleClickCancelEdit} disabled={disabled}>
+          <button type="button" onClick={handleClickCancelEdit} disabled={disabled}>
             cancel
           </button>
         </>

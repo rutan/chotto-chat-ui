@@ -1,8 +1,7 @@
-import React, { useCallback } from 'react';
-import { Select, Dialog, DialogPanel, DialogBackdrop, DialogTitle } from '@headlessui/react';
-import { cx } from '../libs';
-import { DarkModeButton } from './DarkModeButton';
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, Select } from '@headlessui/react';
+import { useCallback } from 'react';
 import { useDarkMode } from '../hooks';
+import { cx } from '../libs';
 
 export interface SettingDialogProps {
   isOpen: boolean;
@@ -24,7 +23,7 @@ export const SettingDialog = ({ isOpen, systemPrompt, onChangeSystemPrompt, onCl
         toggleDarkMode();
       }
     },
-    [isDarkMode],
+    [isDarkMode, toggleDarkMode],
   );
 
   const handleChangeSystemPrompt = useCallback(
@@ -63,7 +62,7 @@ export const SettingDialog = ({ isOpen, systemPrompt, onChangeSystemPrompt, onCl
             </SettingSection>
 
             <div className="flex justify-center gap-4">
-              <button className="min-h-12 px-8 bg-primary text-on-primary rounded" onClick={onClose}>
+              <button type="button" className="min-h-12 px-8 bg-primary text-on-primary rounded" onClick={onClose}>
                 Close
               </button>
             </div>

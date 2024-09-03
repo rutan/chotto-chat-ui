@@ -1,9 +1,9 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { MdSettings } from 'react-icons/md';
-import { cx, Model } from '../libs';
+import { type Model, cx } from '../libs';
+import { HeaderMenu } from './HeaderMenu';
 import { ModelSelector } from './ModelSelector';
 import { SettingDialog } from './SettingDialog';
-import { HeaderMenu } from './HeaderMenu';
 
 export interface HeaderProps {
   className?: string;
@@ -42,6 +42,7 @@ export const Header = ({
         <div className="max-w-3xl h-full mx-auto grid grid-cols-[1fr_auto_1fr] items-center justify-between">
           <div className="flex justify-start gap-1">
             <button
+              type="button"
               className="flex items-center justify-center w-10 h-10 text-on-surface rounded hover:bg-surface-dim"
               onClick={handleOpenSettingModal}
               disabled={disabled}

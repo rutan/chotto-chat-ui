@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ApiConfig, fetchListModels, Model } from '../libs';
+import { type ApiConfig, type Model, fetchListModels } from '../libs';
 
 export function useModels(config: ApiConfig) {
   const [models, setModels] = useState<Model[]>([]);

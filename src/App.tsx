@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { MessageHistory, useChatGenerator, useMessageHistories, useModels } from './hooks';
-import { ChatForm, Header, ChatBalloonList } from './components';
-import { Model } from './libs';
+import { useState } from 'react';
+import { ChatBalloonList, ChatForm, Header } from './components';
+import { type MessageHistory, useChatGenerator, useMessageHistories, useModels } from './hooks';
+import type { Model } from './libs';
 
 const config = { url: 'http://localhost:11434' };
 

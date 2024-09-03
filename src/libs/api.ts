@@ -11,7 +11,7 @@ export type Model = z.infer<typeof modelSchema>;
 
 export async function fetchListModels(config: ApiConfig) {
   const json = await fetch(`${config.url}/api/tags`).then((resp) => resp.json());
-  return json.models.map((model: any) => modelSchema.parse(model));
+  return json.models.map((model: unknown) => modelSchema.parse(model));
 }
 
 export interface ChatMessage {

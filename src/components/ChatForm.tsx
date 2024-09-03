@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import TextareaAutosize from 'react-textarea-autosize';
+import { type ChangeEvent, type KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { MdSend } from 'react-icons/md';
+import TextareaAutosize from 'react-textarea-autosize';
 
 export interface ChatFormProps {
   onSend: (message: string) => void;
@@ -13,10 +13,10 @@ export const ChatForm = ({ onSend, initMessage, isChatting, onCancelChat }: Chat
   const [message, setMessage] = useState(initMessage ?? '');
   const [isComposing, setIsComposing] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    (e: KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
         e.preventDefault();
         e.currentTarget.form?.dispatchEvent(new Event('submit', { bubbles: true }));
@@ -25,7 +25,7 @@ export const ChatForm = ({ onSend, initMessage, isChatting, onCancelChat }: Chat
     [isComposing],
   );
 
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleChange = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.currentTarget.value);
     setIsFocused(true);
   }, []);
@@ -61,7 +61,7 @@ export const ChatForm = ({ onSend, initMessage, isChatting, onCancelChat }: Chat
     if (textareaRef.current) {
       textareaRef.current.focus();
     }
-  }, [isChatting]);
+  }, [isChatting, isFocused]);
 
   return (
     <form

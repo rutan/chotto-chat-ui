@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ApiConfig, ChatMessage, postChatStream } from '../libs';
-import { MessageHistory } from './useMessageHistories';
+import { type ApiConfig, type ChatMessage, postChatStream } from '../libs';
+import type { MessageHistory } from './useMessageHistories';
 
 export function useChatGenerator({
   config,
@@ -55,12 +55,13 @@ export function useChatGenerator({
           const { done, value } = await reader.read();
           if (value) {
             const text = decoder.decode(value);
-            text.split('\n').forEach((line) => {
-              if (!line) return;
+            const lines = text.split('\n');
+            for (const line of lines) {
+              if (!line) continue;
               const data = JSON.parse(line);
               responseMessage.content = `${responseMessage.content}${data.message.content}`;
               setGeneratingMessage({ ...responseMessage });
-            });
+            }
           }
 
           if (done) {
@@ -82,7 +83,7 @@ export function useChatGenerator({
         setGeneratingMessage(null);
       }
     })();
-  }, [config, model, messages]);
+  }, [loading, config, model, messages, addMessageHistory]);
 
   const abort = useCallback(() => {
     console.log(abortControllerRef.current);

@@ -1,6 +1,6 @@
-import React from 'react';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { MdMoreVert, MdDelete } from 'react-icons/md';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { MdDelete, MdMoreVert } from 'react-icons/md';
 import { cx } from '../libs';
 
 export interface HeaderMenuProps {
@@ -12,8 +12,8 @@ const MenuLink = ({
   className,
   children,
   ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  children: React.ReactNode;
+}: ButtonHTMLAttributes<HTMLButtonElement> & {
+  children: ReactNode;
 }) => {
   return (
     <button className={cx('flex w-full items-center gap-2 px-3 py-2 hover:bg-surface-dim', className)} {...props}>

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { v4 as uuidV4 } from 'uuid';
-import { ChatMessage, nonNullableFilter } from '../libs';
+import { type ChatMessage, nonNullableFilter } from '../libs';
 
 export interface MessageHistory {
   id: string;
@@ -35,7 +35,7 @@ export function useMessageHistories() {
 
   const currentHistories = useMemo(() => {
     return messageIds.map((id) => messageHistories.find((history) => history.id === id)).filter(nonNullableFilter);
-  }, [messageIds]);
+  }, [messageIds, messageHistories]);
 
   const addNewMessageHistory = useCallback((message: ChatMessage) => {
     setMessageHistories((prev) => {
@@ -113,7 +113,7 @@ export function useMessageHistories() {
         nextIds: [],
       },
     ]);
-  }, []);
+  }, [systemPrompt]);
 
   useEffect(() => {
     setMessageHistories((prev) => {

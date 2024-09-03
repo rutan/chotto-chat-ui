@@ -1,10 +1,9 @@
-import React from 'react';
-import Markdown, { Components } from 'react-markdown';
-import remarkBreaks from 'remark-breaks';
+import { MdPerson, MdSmartToy } from 'react-icons/md';
+import Markdown, { type Components } from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { ChatMessage, cx } from '../libs';
-import { MdPerson, MdSmartToy } from 'react-icons/md';
+import remarkBreaks from 'remark-breaks';
+import { type ChatMessage, cx } from '../libs';
 
 export interface ChatBalloonProps {
   className?: string;
