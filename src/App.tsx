@@ -1,12 +1,19 @@
 import { useState } from 'react';
 import { ChatBalloonList, ChatForm, Header } from './components';
-import { type MessageHistory, useChatGenerator, useMessageHistories, useModels } from './hooks';
+import {
+  type MessageHistory,
+  useAppSettings,
+  useChatGenerator,
+  useDarkMode,
+  useMessageHistories,
+  useModels,
+} from './hooks';
 import type { Model } from './libs';
 
-const config = { url: 'http://localhost:11434' };
-
 export const App: React.FC = () => {
-  const { models } = useModels(config);
+  const [appSettings] = useAppSettings();
+  useDarkMode(appSettings);
+  const { models } = useModels();
   const [currentModel, setCurrentModel] = useState<Model | null>(null);
   const {
     systemPrompt,
@@ -22,7 +29,6 @@ export const App: React.FC = () => {
     generatingMessage,
     abort: cancelChat,
   } = useChatGenerator({
-    config,
     model: currentModel?.name ?? '',
     messageHistories: currentHistories,
     addMessageHistory: addNewMessageHistory,

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { v4 as uuidV4 } from 'uuid';
 import { type ChatMessage, nonNullableFilter } from '../libs';
+import { useAppSettings } from './useAppSettings';
 
 export interface MessageHistory {
   id: string;
@@ -20,7 +21,8 @@ function seekMessageIds(messageHistories: MessageHistory[], seedId: string): str
 }
 
 export function useMessageHistories() {
-  const [systemPrompt, setSystemPrompt] = useState('You are Assistant bot.');
+  const [appSettings] = useAppSettings();
+  const [systemPrompt, setSystemPrompt] = useState('');
   const [messageHistories, setMessageHistories] = useState<MessageHistory[]>([
     {
       id: uuidV4(),
@@ -109,11 +111,11 @@ export function useMessageHistories() {
     setMessageHistories([
       {
         id: uuidV4(),
-        message: { role: 'system', content: systemPrompt },
+        message: { role: 'system', content: systemPrompt || appSettings.defaultSystemPrompt },
         nextIds: [],
       },
     ]);
-  }, [systemPrompt]);
+  }, [systemPrompt, appSettings.defaultSystemPrompt]);
 
   useEffect(() => {
     setMessageHistories((prev) => {
@@ -123,15 +125,15 @@ export function useMessageHistories() {
       return [
         {
           ...systemMessage,
-          message: { role: 'system', content: systemPrompt },
+          message: { role: 'system', content: systemPrompt || appSettings.defaultSystemPrompt },
         },
         ...prev.filter((history) => history.message.role !== 'system'),
       ];
     });
-  }, [systemPrompt]);
+  }, [systemPrompt, appSettings.defaultSystemPrompt]);
 
   return {
-    systemPrompt,
+    systemPrompt: systemPrompt,
     setSystemPrompt,
     messageHistories,
     currentHistories,

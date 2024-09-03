@@ -1,34 +1,32 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import type { AppSettings } from '../db';
 
-export function useDarkMode() {
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    const stored = localStorage.getItem('dark-mode');
-    try {
-      return stored ? JSON.parse(stored) : false;
-    } catch (_) {
-      return false;
-    }
-  });
-
-  const toggleDarkMode = useCallback(() => {
-    setIsDarkMode((prev) => {
-      const next = !prev;
-      localStorage.setItem('dark-mode', JSON.stringify(next));
-      return next;
-    });
-  }, []);
-
+export function useDarkMode(appSettings: AppSettings) {
   useEffect(() => {
     const root = document.documentElement;
-    if (isDarkMode) {
+    switch (appSettings.colorTheme) {
+      case 'system':
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          root.classList.add('dark');
+          root.classList.remove('light');
+        } else {
+          root.classList.add('light');
+          root.classList.remove('dark');
+        }
+        break;
+      case 'light':
+        root.classList.add('light');
+        root.classList.remove('dark');
+        break;
+      case 'dark':
+        root.classList.add('dark');
+        root.classList.remove('light');
+        break;
+    }
+    if (appSettings.colorTheme === 'dark') {
       root.classList.add('dark');
     } else {
       root.classList.remove('dark');
     }
-  }, [isDarkMode]);
-
-  return {
-    isDarkMode,
-    toggleDarkMode,
-  };
+  }, [appSettings.colorTheme]);
 }

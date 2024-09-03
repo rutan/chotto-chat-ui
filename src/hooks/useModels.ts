@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react';
-import { type ApiConfig, type Model, fetchListModels } from '../libs';
+import { type Model, fetchListModels } from '../libs';
+import { useAppSettings } from './useAppSettings';
 
-export function useModels(config: ApiConfig) {
+export function useModels() {
+  const [appSettings] = useAppSettings();
   const [models, setModels] = useState<Model[]>([]);
 
   useEffect(() => {
-    fetchListModels(config).then((data) => {
+    fetchListModels({
+      url: appSettings.apiEndpoint,
+    }).then((data) => {
       setModels(data);
     });
-  }, [config]);
+  }, [appSettings.apiEndpoint]);
 
   return {
     models,

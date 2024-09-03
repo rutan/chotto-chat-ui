@@ -1,18 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { type ApiConfig, type ChatMessage, postChatStream } from '../libs';
+import { type ChatMessage, postChatStream } from '../libs';
+import { useAppSettings } from './useAppSettings';
 import type { MessageHistory } from './useMessageHistories';
 
 export function useChatGenerator({
-  config,
   model,
   messageHistories,
   addMessageHistory,
 }: {
-  config: ApiConfig;
   model: string;
   messageHistories: MessageHistory[];
   addMessageHistory: (message: ChatMessage) => void;
 }) {
+  const [appSettings] = useAppSettings();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<unknown | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -46,9 +46,16 @@ export function useChatGenerator({
 
       try {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        const reader = await postChatStream(config, model, messages, {
-          signal: controller.signal,
-        });
+        const reader = await postChatStream(
+          {
+            url: appSettings.apiEndpoint,
+          },
+          model,
+          messages,
+          {
+            signal: controller.signal,
+          },
+        );
         const decoder = new TextDecoder();
 
         while (true) {
@@ -83,7 +90,7 @@ export function useChatGenerator({
         setGeneratingMessage(null);
       }
     })();
-  }, [loading, config, model, messages, addMessageHistory]);
+  }, [loading, appSettings, model, messages, addMessageHistory]);
 
   const abort = useCallback(() => {
     console.log(abortControllerRef.current);
