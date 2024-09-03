@@ -1,4 +1,5 @@
 import { type ChangeEvent, type KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MdSend } from 'react-icons/md';
 import TextareaAutosize from 'react-textarea-autosize';
 
@@ -10,6 +11,7 @@ export interface ChatFormProps {
 }
 
 export const ChatForm = ({ onSend, initMessage, isChatting, onCancelChat }: ChatFormProps) => {
+  const { t } = useTranslation();
   const [message, setMessage] = useState(initMessage ?? '');
   const [isComposing, setIsComposing] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -79,7 +81,7 @@ export const ChatForm = ({ onSend, initMessage, isChatting, onCancelChat }: Chat
         onCompositionEnd={handleCompositionEnd}
         onBlur={handleBlur}
         disabled={isChatting}
-        placeholder="Type a message..."
+        placeholder={t('ChatForm.placeholder')}
         ref={textareaRef}
       >
         {message}

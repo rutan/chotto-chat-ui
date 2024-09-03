@@ -1,5 +1,6 @@
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, Select } from '@headlessui/react';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppSettings } from '../hooks';
 import { cx } from '../libs';
 
@@ -13,12 +14,21 @@ const SettingSection = ({ className, children }: { className?: string; children?
 );
 
 export const SettingDialog = ({ isOpen, onClose }: SettingDialogProps) => {
+  const { t } = useTranslation();
   const [appSettings, setAppSettings] = useAppSettings();
   const [tmpApiEndpoint, setTmpApiEndpoint] = useState(appSettings.apiEndpoint);
 
   const handleChangeApiEndpoint = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setTmpApiEndpoint(e.target.value);
   }, []);
+
+  const handleChangeLanguage = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const newLanguage = e.target.value as 'auto' | 'en' | 'ja';
+      setAppSettings((prev) => ({ ...prev, language: newLanguage }));
+    },
+    [setAppSettings],
+  );
 
   const handleChangeDarkMode = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -47,41 +57,55 @@ export const SettingDialog = ({ isOpen, onClose }: SettingDialogProps) => {
         <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
           <DialogPanel className="w-full max-w-lg bg-surface text-on-surface p-8 rounded">
             <SettingSection>
-              <DialogTitle className="text-xl font-bold">API Endpoint</DialogTitle>
+              <DialogTitle className="text-xl font-bold">{t('SettingDialog.apiEndpoint')}</DialogTitle>
               <input
                 type="text"
                 className="w-full p-2 bg-surface-container text-on-surface my-4"
                 value={tmpApiEndpoint}
+                placeholder={t('SettingDialog.apiEndpoint.placeholder')}
                 onChange={handleChangeApiEndpoint}
               />
             </SettingSection>
 
             <SettingSection>
-              <DialogTitle className="text-xl font-bold">Color Theme</DialogTitle>
+              <DialogTitle className="text-xl font-bold">{t('SettingDialog.language')}</DialogTitle>
+              <Select
+                className="w-full p-2 bg-surface-container text-on-surface my-4"
+                value={appSettings.language}
+                onChange={handleChangeLanguage}
+              >
+                <option value="auto">{t('SettingDialog.language.auto')}</option>
+                <option value="en">{t('SettingDialog.language.en')}</option>
+                <option value="ja">{t('SettingDialog.language.ja')}</option>
+              </Select>
+            </SettingSection>
+
+            <SettingSection>
+              <DialogTitle className="text-xl font-bold">{t('SettingDialog.colorTheme')}</DialogTitle>
               <Select
                 className="w-full p-2 bg-surface-container text-on-surface my-4"
                 value={appSettings.colorTheme}
                 onChange={handleChangeDarkMode}
               >
-                <option value="system">System</option>
-                <option value="light">Light mode</option>
-                <option value="dark">Dark mode</option>
+                <option value="system">{t('SettingDialog.colorTheme.system')}</option>
+                <option value="light">{t('SettingDialog.colorTheme.light')}</option>
+                <option value="dark">{t('SettingDialog.colorTheme.dark')}</option>
               </Select>
             </SettingSection>
 
             <SettingSection>
-              <DialogTitle className="text-xl font-bold">Default System Prompt</DialogTitle>
+              <DialogTitle className="text-xl font-bold">{t('SettingDialog.defaultSystemPrompt')}</DialogTitle>
               <textarea
                 className="w-full h-32 p-4 bg-surface-container text-on-surface resize-none my-4"
                 value={appSettings.defaultSystemPrompt}
                 onChange={handleChangeDefaultSystemPrompt}
-                placeholder="You are assistant bot."
+                placeholder={t('SettingDialog.defaultSystemPrompt.placeholder')}
               />
             </SettingSection>
 
             <div className="flex justify-center gap-4">
               <button type="button" className="min-h-12 px-8 bg-primary text-on-primary rounded" onClick={handleClose}>
-                Close
+                {t('SettingDialog.close')}
               </button>
             </div>
           </DialogPanel>

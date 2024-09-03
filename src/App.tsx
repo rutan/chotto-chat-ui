@@ -5,6 +5,7 @@ import {
   useAppSettings,
   useChatGenerator,
   useDarkMode,
+  useLocale,
   useMessageHistories,
   useModels,
 } from './hooks';
@@ -13,6 +14,8 @@ import type { Model } from './libs';
 export const App: React.FC = () => {
   const [appSettings] = useAppSettings();
   useDarkMode(appSettings);
+  useLocale(appSettings);
+
   const { models } = useModels();
   const [currentModel, setCurrentModel] = useState<Model | null>(null);
   const {

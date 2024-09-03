@@ -58,12 +58,7 @@ export const Header = ({
           </div>
         </div>
       </div>
-      <SettingDialog
-        isOpen={isShowSettingDialog}
-        systemPrompt={systemPrompt}
-        onChangeSystemPrompt={onChangeSystemPrompt}
-        onClose={handleCloseSettingDialog}
-      />
+      <SettingDialog isOpen={isShowSettingDialog} onClose={handleCloseSettingDialog} />
     </>
   );
 };

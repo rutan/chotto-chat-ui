@@ -1,0 +1,18 @@
+{
+  "ChatForm.placeholder": "Type a message...",
+  "HeaderMenu.removeChat": "Remove Chat",
+  "ModelSelector.selectModel": "Select Model...",
+  "SettingDialog.apiEndpoint": "API Endpoint",
+  "SettingDialog.apiEndpoint.placeholder": "http://localhost:11434",
+  "SettingDialog.language": "Language",
+  "SettingDialog.language.auto": "(auto)",
+  "SettingDialog.language.en": "English",
+  "SettingDialog.language.ja": "日本語",
+  "SettingDialog.colorTheme": "Color Theme",
+  "SettingDialog.colorTheme.system": "System",
+  "SettingDialog.colorTheme.light": "Light Mode",
+  "SettingDialog.colorTheme.dark": "Dark Mode",
+  "SettingDialog.defaultSystemPrompt": "Default System Prompt",
+  "SettingDialog.defaultSystemPrompt.placeholder": "You are assistant bot.",
+  "SettingDialog.close": "Close"
+}

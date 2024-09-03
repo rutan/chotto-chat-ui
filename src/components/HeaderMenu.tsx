@@ -1,5 +1,6 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MdDelete, MdMoreVert } from 'react-icons/md';
 import { cx } from '../libs';
 
@@ -23,6 +24,8 @@ const MenuLink = ({
 };
 
 export const HeaderMenu = ({ disabled, onClickRemoveHistory }: HeaderMenuProps) => {
+  const { t } = useTranslation();
+
   return (
     <Menu>
       <MenuButton className="flex items-center justify-center w-10 h-10 text-on-surface rounded hover:bg-surface-dim">
@@ -32,7 +35,7 @@ export const HeaderMenu = ({ disabled, onClickRemoveHistory }: HeaderMenuProps) 
         <MenuItem>
           <MenuLink className="text-error" disabled={disabled} onClick={onClickRemoveHistory}>
             <MdDelete />
-            Remove History
+            {t('HeaderMenu.removeChat')}
           </MenuLink>
         </MenuItem>
       </MenuItems>

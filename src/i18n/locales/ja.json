@@ -1,0 +1,16 @@
+{
+  "ChatForm.placeholder": "AIにメッセージを入力...",
+  "HeaderMenu.removeChat": "この会話を削除",
+  "ModelSelector.selectModel": "モデルを選択...",
+  "SettingDialog.apiEndpoint": "APIエンドポイント",
+  "SettingDialog.apiEndpoint.placeholder": "http://localhost:11434",
+  "SettingDialog.language": "言語設定",
+  "SettingDialog.language.auto": "（自動設定）",
+  "SettingDialog.colorTheme": "テーマ",
+  "SettingDialog.colorTheme.system": "システム設定",
+  "SettingDialog.colorTheme.light": "ライトモード",
+  "SettingDialog.colorTheme.dark": "ダークモード",
+  "SettingDialog.defaultSystemPrompt": "デフォルトのシステムプロンプト",
+  "SettingDialog.defaultSystemPrompt.placeholder": "あなたはアシスタントAIです。",
+  "SettingDialog.close": "閉じる"
+}
