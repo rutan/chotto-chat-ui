@@ -14,5 +14,7 @@
   "SettingDialog.colorTheme.dark": "ダークモード",
   "SettingDialog.defaultSystemPrompt": "デフォルトのシステムプロンプト",
   "SettingDialog.defaultSystemPrompt.placeholder": "あなたはアシスタントAIです。",
-  "SettingDialog.close": "閉じる"
+  "SettingDialog.close": "閉じる",
+  "SideMenu.newChat": "新規チャット",
+  "SideMenu.settings": "設定"
 }

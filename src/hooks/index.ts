@@ -5,3 +5,4 @@ export * from './useDatabase';
 export * from './useLocale';
 export * from './useMessageHistories';
 export * from './useModels';
+export * from './useSideMenu';

@@ -8,3 +8,4 @@ export * from './Header';
 export * from './HeaderMenu';
 export * from './ModelSelector';
 export * from './SettingDialog';
+export * from './SideMenu';

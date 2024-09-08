@@ -30,9 +30,10 @@ export const ChatBalloonList = ({
     });
   }, []);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(generatingMessage): scroll to bottom when generating message
   useEffect(() => {
     doScrollToBottom();
-  }, [doScrollToBottom]);
+  }, [doScrollToBottom, generatingMessage]);
 
   return (
     <div className={cx('ChatList', 'grow overflow-y-scroll', className)} ref={chatContainerRef}>

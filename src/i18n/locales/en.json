@@ -16,5 +16,7 @@
   "SettingDialog.colorTheme.dark": "Dark Mode",
   "SettingDialog.defaultSystemPrompt": "Default System Prompt",
   "SettingDialog.defaultSystemPrompt.placeholder": "You are assistant bot.",
-  "SettingDialog.close": "Close"
+  "SettingDialog.close": "Close",
+  "SideMenu.newChat": "New Chat",
+  "SideMenu.settings": "Settings"
 }
