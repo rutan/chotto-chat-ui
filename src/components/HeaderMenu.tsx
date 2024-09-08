@@ -1,5 +1,5 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { type ButtonHTMLAttributes, type ReactNode, forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdDelete, MdMoreVert } from 'react-icons/md';
 import { cx } from '../libs';
@@ -9,19 +9,17 @@ export interface HeaderMenuProps {
   onClickRemoveHistory: () => void;
 }
 
-const MenuLink = ({
-  className,
-  children,
-  ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & {
-  children: ReactNode;
-}) => {
-  return (
-    <button className={cx('flex w-full items-center gap-2 px-3 py-2 hover:bg-surface-dim', className)} {...props}>
+const MenuLink = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement> & { children: ReactNode }>(
+  ({ className, children, ...props }, ref) => (
+    <button
+      ref={ref}
+      className={cx('flex w-full items-center gap-2 px-3 py-2 hover:bg-surface-dim', className)}
+      {...props}
+    >
       {children}
     </button>
-  );
-};
+  ),
+);
 
 export const HeaderMenu = ({ disabled, onClickRemoveHistory }: HeaderMenuProps) => {
   const { t } = useTranslation();
