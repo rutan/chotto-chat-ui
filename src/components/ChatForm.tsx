@@ -1,7 +1,6 @@
-import { type ChangeEvent, type KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useCallback, useState } from 'react';
 import { MdSend } from 'react-icons/md';
-import TextareaAutosize from 'react-textarea-autosize';
+import { ChatTextArea } from './ChatTextArea';
 
 export interface ChatFormProps {
   onSend: (message: string) => void;
@@ -11,37 +10,10 @@ export interface ChatFormProps {
 }
 
 export const ChatForm = ({ onSend, initMessage, isChatting, onCancelChat }: ChatFormProps) => {
-  const { t } = useTranslation();
   const [message, setMessage] = useState(initMessage ?? '');
-  const [isComposing, setIsComposing] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
-        e.preventDefault();
-        e.currentTarget.form?.dispatchEvent(new Event('submit', { bubbles: true }));
-      }
-    },
-    [isComposing],
-  );
-
-  const handleChange = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.currentTarget.value);
-    setIsFocused(true);
-  }, []);
-
-  const handleCompositionStart = useCallback(() => {
-    setIsComposing(true);
-  }, []);
-
-  const handleCompositionEnd = useCallback(() => {
-    setIsComposing(false);
-  }, []);
-
-  const handleBlur = useCallback(() => {
-    setIsFocused(false);
+  const handleChange = useCallback((message: string) => {
+    setMessage(message);
   }, []);
 
   const handleSubmit = useCallback(
@@ -50,20 +22,10 @@ export const ChatForm = ({ onSend, initMessage, isChatting, onCancelChat }: Chat
       if (message) {
         onSend(message);
         setMessage('');
-        setIsFocused(true);
       }
     },
     [message, onSend],
   );
-
-  useEffect(() => {
-    if (isChatting) return;
-    if (!isFocused) return;
-
-    if (textareaRef.current) {
-      textareaRef.current.focus();
-    }
-  }, [isChatting, isFocused]);
 
   return (
     <form
@@ -71,21 +33,14 @@ export const ChatForm = ({ onSend, initMessage, isChatting, onCancelChat }: Chat
       action="#"
       onSubmit={handleSubmit}
     >
-      <TextareaAutosize
+      <ChatTextArea
         className="flex-grow w-full p-4 bg-transparent resize-none"
         maxRows={5}
         value={message}
         onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        onCompositionStart={handleCompositionStart}
-        onCompositionEnd={handleCompositionEnd}
-        onBlur={handleBlur}
+        autoSubmit={true}
         disabled={isChatting}
-        placeholder={t('ChatForm.placeholder')}
-        ref={textareaRef}
-      >
-        {message}
-      </TextareaAutosize>
+      />
       {isChatting ? (
         onCancelChat && (
           <button className="px-4" type="button" onClick={onCancelChat}>

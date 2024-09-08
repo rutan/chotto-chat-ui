@@ -1,5 +1,7 @@
 {
-  "ChatForm.placeholder": "AIにメッセージを入力...",
+  "ChatEditForm.cancel": "キャンセル",
+  "ChatEditForm.submit": "送信",
+  "ChatTextArea.placeholder": "AIにメッセージを入力...",
   "HeaderMenu.removeChat": "この会話を削除",
   "ModelSelector.selectModel": "モデルを選択...",
   "SettingDialog.apiEndpoint": "APIエンドポイント",

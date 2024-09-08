@@ -3,7 +3,7 @@ import { MdChevronLeft, MdChevronRight, MdEdit } from 'react-icons/md';
 import type { MessageHistory } from '../hooks';
 import { isElementInViewport } from '../libs';
 import { ChatBalloon } from './ChatBalloon';
-import { ChatForm } from './ChatForm';
+import { ChatEditForm } from './ChatEditForm';
 
 export interface ChatBalloonOfMessageHistoryProps {
   messageHistory: MessageHistory;
@@ -116,12 +116,11 @@ export const ChatBalloonOfMessageHistory = ({
   return (
     <div className="ChatMessageHistoryBalloon" ref={containerRef}>
       {isEdit && !disabled ? (
-        <>
-          <ChatForm initMessage={messageHistory.message.content} onSend={handleSendMessage} />
-          <button type="button" onClick={handleClickCancelEdit} disabled={disabled}>
-            cancel
-          </button>
-        </>
+        <ChatEditForm
+          initMessage={messageHistory.message.content}
+          onSend={handleSendMessage}
+          onCancel={handleClickCancelEdit}
+        />
       ) : (
         <ChatBalloon message={messageHistory.message}>
           <div className="flex justify-between">

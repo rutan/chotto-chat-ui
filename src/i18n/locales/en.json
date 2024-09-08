@@ -1,5 +1,7 @@
 {
-  "ChatForm.placeholder": "Type a message...",
+  "ChatEditForm.cancel": "Cancel",
+  "ChatEditForm.submit": "Submit",
+  "ChatTextArea.placeholder": "Type a message...",
   "HeaderMenu.removeChat": "Remove Chat",
   "ModelSelector.selectModel": "Select Model...",
   "SettingDialog.apiEndpoint": "API Endpoint",
