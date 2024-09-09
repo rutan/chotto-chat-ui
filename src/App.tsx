@@ -56,9 +56,7 @@ export const App: React.FC = () => {
 
   const handleNewChat = useCallback(() => {
     resetHistories(); // wip
-
-    setIsShowSideMenu(false);
-  }, [resetHistories, setIsShowSideMenu]);
+  }, [resetHistories]);
 
   const handleToggleSideMenu = useCallback(() => {
     setIsShowSideMenu(!isShowSideMenu);
