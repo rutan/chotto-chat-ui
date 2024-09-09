@@ -47,11 +47,22 @@ export const App: React.FC = () => {
   );
 
   const handleSendNewBranch = useCallback(
-    (history: MessageHistory, message: string) => {
-      const userMessage = { role: 'user', content: message } as const;
+    ({
+      history,
+      message,
+      role = 'user',
+    }: { history: MessageHistory; message: string; role?: 'system' | 'user' | 'assistant' }) => {
+      const userMessage = { role, content: message } as const;
       addBranchMessageHistory(history, userMessage);
     },
     [addBranchMessageHistory],
+  );
+
+  const handleChangeBranch = useCallback(
+    ({ parentHistory, nextId }: { parentHistory: MessageHistory; nextId?: string }) => {
+      changeBranchMessageHistory(parentHistory, nextId);
+    },
+    [changeBranchMessageHistory],
   );
 
   const handleNewChat = useCallback(() => {
@@ -102,8 +113,8 @@ export const App: React.FC = () => {
         <ChatBalloonList
           currentHistories={currentHistories}
           generatingMessage={generatingMessage}
-          handleSendNewBranch={handleSendNewBranch}
-          changeBranchMessageHistory={changeBranchMessageHistory}
+          onSendNewBranch={handleSendNewBranch}
+          onChangeBranch={handleChangeBranch}
           disabled={chatLoading}
         />
         {currentModel && (

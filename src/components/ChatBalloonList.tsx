@@ -8,8 +8,15 @@ export interface ChatBalloonListProps {
   className?: string;
   currentHistories: MessageHistory[];
   generatingMessage: ChatMessage | null;
-  handleSendNewBranch: (history: MessageHistory, message: string) => void;
-  changeBranchMessageHistory: (targetHistory: MessageHistory, newNextId?: string) => void;
+  onSendNewBranch: (params: {
+    history: MessageHistory;
+    message: string;
+    role?: 'system' | 'user' | 'assistant';
+  }) => void;
+  onChangeBranch?: (params: {
+    parentHistory: MessageHistory;
+    nextId?: string;
+  }) => void;
   disabled: boolean;
 }
 
@@ -17,8 +24,8 @@ export const ChatBalloonList = ({
   className,
   currentHistories,
   generatingMessage,
-  handleSendNewBranch,
-  changeBranchMessageHistory,
+  onSendNewBranch,
+  onChangeBranch,
   disabled,
 }: ChatBalloonListProps) => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -43,8 +50,8 @@ export const ChatBalloonList = ({
             key={history.id}
             messageHistory={history}
             parentMessageHistory={currentHistories[index - 1]}
-            onSendNewBranch={handleSendNewBranch}
-            onChangeBranch={changeBranchMessageHistory}
+            onSendNewBranch={onSendNewBranch}
+            onChangeBranch={onChangeBranch}
             disabled={disabled}
           />
         ))}

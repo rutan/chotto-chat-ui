@@ -8,8 +8,15 @@ import { ChatEditForm } from './ChatEditForm';
 export interface ChatBalloonOfMessageHistoryProps {
   messageHistory: MessageHistory;
   parentMessageHistory?: MessageHistory;
-  onSendNewBranch?: (parentHistory: MessageHistory, message: string) => void;
-  onChangeBranch?: (parentHistory: MessageHistory, nextId?: string) => void;
+  onSendNewBranch?: (params: {
+    history: MessageHistory;
+    message: string;
+    role?: 'system' | 'user' | 'assistant';
+  }) => void;
+  onChangeBranch?: (params: {
+    parentHistory: MessageHistory;
+    nextId?: string;
+  }) => void;
   disabled?: boolean;
 }
 
@@ -69,10 +76,14 @@ export const ChatBalloonOfMessageHistory = ({
     (message: string) => {
       setIsEdit(false);
       if (parentMessageHistory && onSendNewBranch) {
-        onSendNewBranch(parentMessageHistory, message);
+        onSendNewBranch({
+          history: parentMessageHistory,
+          message,
+          role: messageHistory.message.role,
+        });
       }
     },
-    [parentMessageHistory, onSendNewBranch],
+    [parentMessageHistory, messageHistory, onSendNewBranch],
   );
 
   const handleChangeBranch = useCallback(
@@ -87,7 +98,10 @@ export const ChatBalloonOfMessageHistory = ({
       const nextId = parentMessageHistory.nextIds[nextIndex];
       if (!nextId) return;
 
-      onChangeBranch(parentMessageHistory, nextId);
+      onChangeBranch({
+        parentHistory: parentMessageHistory,
+        nextId,
+      });
     },
     [messageHistory, parentMessageHistory, onChangeBranch],
   );
@@ -124,7 +138,7 @@ export const ChatBalloonOfMessageHistory = ({
       ) : (
         <ChatBalloon message={messageHistory.message}>
           <div className="flex justify-between">
-            {messageHistory.message.role === 'user' && onSendNewBranch && (
+            {onSendNewBranch && (
               <FooterMenuButton onClick={handleClickEdit} disabled={disabled}>
                 <MdEdit title="Edit" />
               </FooterMenuButton>
