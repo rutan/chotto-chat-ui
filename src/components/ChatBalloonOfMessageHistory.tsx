@@ -125,40 +125,48 @@ export const ChatBalloonOfMessageHistory = ({
     return parentMessageHistory?.nextIds?.length ?? 0;
   }, [parentMessageHistory]);
 
+  const isShowEditView = useMemo(() => {
+    return isEdit && !disabled;
+  }, [isEdit, disabled]);
+
   if (messageHistory.message.role === 'system') return null;
 
   return (
     <div className="ChatMessageHistoryBalloon" ref={containerRef}>
-      {isEdit && !disabled ? (
-        <ChatEditForm
-          initMessage={messageHistory.message.content}
-          onSend={handleSendMessage}
-          onCancel={handleClickCancelEdit}
-        />
-      ) : (
-        <ChatBalloon message={messageHistory.message}>
-          <div className="flex justify-between">
-            {onSendNewBranch && (
-              <FooterMenuButton onClick={handleClickEdit} disabled={disabled}>
-                <MdEdit title="Edit" />
-              </FooterMenuButton>
-            )}
-            {maxBranchIndex > 1 && (
-              <div className="flex items-center text-sm">
-                <ChangeBranchButton onClick={handleChangePrevBranch} disabled={disabled}>
-                  <MdChevronLeft title="prev" />
-                </ChangeBranchButton>
-                <span>
-                  {currentBranchIndex + 1} / {maxBranchIndex}
-                </span>
-                <ChangeBranchButton onClick={handleChangeNextBranch} disabled={disabled}>
-                  <MdChevronRight title="next" />
-                </ChangeBranchButton>
-              </div>
-            )}
-          </div>
-        </ChatBalloon>
-      )}
+      <ChatBalloon message={messageHistory.message} hiddenMessageBody={isShowEditView}>
+        <div className="flex justify-between">
+          {isShowEditView ? (
+            <div className="w-full">
+              <ChatEditForm
+                initMessage={messageHistory.message.content}
+                onSend={handleSendMessage}
+                onCancel={handleClickCancelEdit}
+              />
+            </div>
+          ) : (
+            <>
+              {onSendNewBranch && (
+                <FooterMenuButton onClick={handleClickEdit} disabled={disabled}>
+                  <MdEdit title="Edit" />
+                </FooterMenuButton>
+              )}
+              {maxBranchIndex > 1 && (
+                <div className="flex items-center text-sm">
+                  <ChangeBranchButton onClick={handleChangePrevBranch} disabled={disabled}>
+                    <MdChevronLeft title="prev" />
+                  </ChangeBranchButton>
+                  <span>
+                    {currentBranchIndex + 1} / {maxBranchIndex}
+                  </span>
+                  <ChangeBranchButton onClick={handleChangeNextBranch} disabled={disabled}>
+                    <MdChevronRight title="next" />
+                  </ChangeBranchButton>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </ChatBalloon>
     </div>
   );
 };

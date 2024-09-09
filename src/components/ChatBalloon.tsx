@@ -8,6 +8,7 @@ import { type ChatMessage, cx } from '../libs';
 export interface ChatBalloonProps {
   className?: string;
   message: ChatMessage;
+  hiddenMessageBody?: boolean;
   children?: React.ReactNode;
 }
 
@@ -34,7 +35,7 @@ const MarkdownComponents: Components = {
 
 const remarkPlugins = [remarkBreaks];
 
-export const ChatBalloon = ({ className, message, children }: ChatBalloonProps) => {
+export const ChatBalloon = ({ className, message, hiddenMessageBody, children }: ChatBalloonProps) => {
   return (
     <div
       className={cx('ChatBalloon', 'flex gap-2', message.role === 'user' ? 'flex-row-reverse' : 'flex-row', className)}
@@ -52,9 +53,11 @@ export const ChatBalloon = ({ className, message, children }: ChatBalloonProps) 
           'flex-grow px-4 py-2 rounded shadow-sm text-on-surface',
         )}
       >
-        <Markdown components={MarkdownComponents} remarkPlugins={remarkPlugins}>
-          {message.content}
-        </Markdown>
+        {!hiddenMessageBody && (
+          <Markdown components={MarkdownComponents} remarkPlugins={remarkPlugins}>
+            {message.content}
+          </Markdown>
+        )}
         {children}
       </div>
     </div>
