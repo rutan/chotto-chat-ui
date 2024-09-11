@@ -6,7 +6,7 @@ import { cx } from '../libs';
 
 export interface HeaderMenuProps {
   disabled: boolean;
-  onClickRemoveHistory: () => void;
+  onClickRemoveChat: () => void;
 }
 
 const MenuLink = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement> & { children: ReactNode }>(
@@ -21,7 +21,7 @@ const MenuLink = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonEl
   ),
 );
 
-export const HeaderMenu = ({ disabled, onClickRemoveHistory }: HeaderMenuProps) => {
+export const HeaderMenu = ({ disabled, onClickRemoveChat }: HeaderMenuProps) => {
   const { t } = useTranslation();
 
   return (
@@ -31,7 +31,7 @@ export const HeaderMenu = ({ disabled, onClickRemoveHistory }: HeaderMenuProps) 
       </MenuButton>
       <MenuItems anchor="bottom end" className="z-50 bg-surface p-1 rounded shadow-md">
         <MenuItem>
-          <MenuLink className="text-error" disabled={disabled} onClick={onClickRemoveHistory}>
+          <MenuLink className="text-error" disabled={disabled} onClick={onClickRemoveChat}>
             <MdDelete />
             {t('HeaderMenu.removeChat')}
           </MenuLink>

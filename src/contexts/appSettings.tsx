@@ -1,5 +1,6 @@
 import { type ReactNode, createContext, useContext, useEffect, useRef, useState } from 'react';
-import { type AppSettings, loadAppSettings, updateAppSettings } from '../db';
+import { loadAppSettings, updateAppSettings } from '../db';
+import type { AppSettings } from '../entities';
 import { DatabaseContext } from './database';
 
 type RealSetAppSettings = (settings: AppSettings | ((prev: AppSettings) => AppSettings)) => void;

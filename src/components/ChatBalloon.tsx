@@ -3,11 +3,12 @@ import Markdown, { type Components } from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkBreaks from 'remark-breaks';
-import { type ChatMessage, cx } from '../libs';
+import type { OllamaMessage } from '../entities';
+import { cx } from '../libs';
 
 export interface ChatBalloonProps {
   className?: string;
-  message: ChatMessage;
+  message: OllamaMessage;
   hiddenMessageBody?: boolean;
   children?: React.ReactNode;
 }
@@ -50,7 +51,7 @@ export const ChatBalloon = ({ className, message, hiddenMessageBody, children }:
       <div
         className={cx(
           message.role === 'user' ? 'bg-surface-container' : 'bg-surface-container-lowest',
-          'flex-grow px-4 py-2 rounded shadow-sm text-on-surface',
+          'w-full flex-grow px-4 py-2 rounded shadow-sm text-on-surface overflow-hidden',
         )}
       >
         {!hiddenMessageBody && (

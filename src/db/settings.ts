@@ -1,14 +1,5 @@
-import { literal, object, string, union, type infer as zInfer } from 'zod';
+import { type AppSettings, appSettingsSchema } from '../entities';
 import type { Database } from './database';
-
-export const appSettingsSchema = object({
-  colorTheme: union([literal('system'), literal('light'), literal('dark')]).default('system'),
-  apiEndpoint: string().default('http://localhost:11434'),
-  language: union([literal('auto'), literal('en'), literal('ja')]).default('auto'),
-  defaultSystemPrompt: string().default('You are assistant bot.'),
-});
-
-export type AppSettings = zInfer<typeof appSettingsSchema>;
 
 function initialAppSettings(): AppSettings {
   return appSettingsSchema.parse({});

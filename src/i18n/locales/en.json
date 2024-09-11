@@ -4,6 +4,7 @@
   "ChatTextArea.placeholder": "Type a message...",
   "HeaderMenu.removeChat": "Remove Chat",
   "ModelSelector.selectModel": "Select Model...",
+  "ModelSelector.reload": "Reload models list",
   "SettingDialog.apiEndpoint": "API Endpoint",
   "SettingDialog.apiEndpoint.placeholder": "http://localhost:11434",
   "SettingDialog.language": "Language",

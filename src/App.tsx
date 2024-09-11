@@ -1,73 +1,23 @@
 import { useCallback, useState } from 'react';
-import { ChatBalloonList, ChatForm, Header, SideMenu } from './components';
-import {
-  type MessageHistory,
-  useAppSettings,
-  useChatGenerator,
-  useDarkMode,
-  useLocale,
-  useMessageHistories,
-  useModels,
-  useSideMenu,
-} from './hooks';
-import { type Model, cx } from './libs';
+import { ChatPanel, SideMenu } from './components';
+import type { Chat } from './entities';
+import { useAppSettings, useDarkMode, useLocale, useSideMenu } from './hooks';
+import { cx } from './libs';
 
 export const App: React.FC = () => {
   const [appSettings] = useAppSettings();
   useDarkMode(appSettings);
   useLocale(appSettings);
-
   const [isShowSideMenu, setIsShowSideMenu] = useSideMenu();
+  const [chat, setChat] = useState<Chat | null>(null);
 
-  const { models } = useModels();
-  const [currentModel, setCurrentModel] = useState<Model | null>(null);
-  const {
-    currentHistories,
-    addNewMessageHistory,
-    addBranchMessageHistory,
-    changeBranchMessageHistory,
-    resetHistories,
-  } = useMessageHistories();
-  const {
-    loading: chatLoading,
-    generatingMessage,
-    abort: cancelChat,
-  } = useChatGenerator({
-    model: currentModel?.name ?? '',
-    messageHistories: currentHistories,
-    addMessageHistory: addNewMessageHistory,
-  });
+  const handleOpenNewChat = useCallback(() => {
+    setChat(null);
+  }, []);
 
-  const handleSendMessage = useCallback(
-    (message: string) => {
-      const userMessage = { role: 'user', content: message } as const;
-      addNewMessageHistory(userMessage);
-    },
-    [addNewMessageHistory],
-  );
-
-  const handleSendNewBranch = useCallback(
-    ({
-      history,
-      message,
-      role = 'user',
-    }: { history: MessageHistory; message: string; role?: 'system' | 'user' | 'assistant' }) => {
-      const userMessage = { role, content: message } as const;
-      addBranchMessageHistory(history, userMessage);
-    },
-    [addBranchMessageHistory],
-  );
-
-  const handleChangeBranch = useCallback(
-    ({ parentHistory, nextId }: { parentHistory: MessageHistory; nextId?: string }) => {
-      changeBranchMessageHistory(parentHistory, nextId);
-    },
-    [changeBranchMessageHistory],
-  );
-
-  const handleNewChat = useCallback(() => {
-    resetHistories(); // wip
-  }, [resetHistories]);
+  const handleSetChat = useCallback((chat: Chat | null) => {
+    setChat(chat);
+  }, []);
 
   const handleToggleSideMenu = useCallback(() => {
     setIsShowSideMenu(!isShowSideMenu);
@@ -93,38 +43,18 @@ export const App: React.FC = () => {
           isShowSideMenu ? 'translate-x-0' : '-translate-x-full',
         )}
       >
-        <SideMenu onNewChat={handleNewChat} disabled={chatLoading} />
+        <SideMenu onNewChat={handleOpenNewChat} chat={chat} onSelectChat={handleSetChat} />
       </div>
-      <div
+      <ChatPanel
+        key={chat?.id ?? 'new-chat'}
         className={cx(
           'flex flex-col h-full flex-1 transition-padding duration-200',
           isShowSideMenu ? 'md:pl-64' : 'md:pl-0',
         )}
-      >
-        <Header
-          className="shrink-0"
-          selectedModel={currentModel}
-          models={models}
-          onChangeModel={setCurrentModel}
-          onRemoveHistory={resetHistories}
-          onToggleSideMenu={handleToggleSideMenu}
-          disabled={chatLoading}
-        />
-        <ChatBalloonList
-          currentHistories={currentHistories}
-          generatingMessage={generatingMessage}
-          onSendNewBranch={handleSendNewBranch}
-          onChangeBranch={handleChangeBranch}
-          disabled={chatLoading}
-        />
-        {currentModel && (
-          <div className="w-full bg-surface p-2 shrink-0">
-            <div className="max-w-3xl px-2 mx-auto">
-              <ChatForm onSend={handleSendMessage} isChatting={chatLoading} onCancelChat={cancelChat} />
-            </div>
-          </div>
-        )}
-      </div>
+        chat={chat}
+        onChangeChat={handleSetChat}
+        onClickToggleSideMenu={handleToggleSideMenu}
+      />
     </div>
   );
 };

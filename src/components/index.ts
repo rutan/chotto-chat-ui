@@ -4,6 +4,7 @@ export * from './ChatBalloonOfGeneratingMessage';
 export * from './ChatBalloonOfMessageHistory';
 export * from './ChatEditForm';
 export * from './ChatForm';
+export * from './ChatPanel';
 export * from './Header';
 export * from './HeaderMenu';
 export * from './ModelSelector';

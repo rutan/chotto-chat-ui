@@ -4,6 +4,7 @@
   "ChatTextArea.placeholder": "AIにメッセージを入力...",
   "HeaderMenu.removeChat": "この会話を削除",
   "ModelSelector.selectModel": "モデルを選択...",
+  "ModelSelector.reload": "モデル一覧を再読込",
   "SettingDialog.apiEndpoint": "APIエンドポイント",
   "SettingDialog.apiEndpoint.placeholder": "http://localhost:11434",
   "SettingDialog.language": "言語設定",

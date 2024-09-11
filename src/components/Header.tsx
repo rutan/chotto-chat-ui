@@ -1,30 +1,31 @@
 import { FiSidebar } from 'react-icons/fi';
-import { type Model, cx } from '../libs';
+import type { Chat, OllamaModel } from '../entities';
+import { cx } from '../libs';
 import { HeaderMenu } from './HeaderMenu';
 import { ModelSelector } from './ModelSelector';
 
 export interface HeaderProps {
   className?: string;
-  selectedModel: Model | null;
-  models: Model[];
-  onChangeModel: (model: Model | null) => void;
-  onRemoveHistory: () => void;
+  chat?: Chat | null;
+  selectedModel: OllamaModel | null;
+  onChangeModel: (model: OllamaModel | null) => void;
+  onRemoveChat: () => void;
   onToggleSideMenu?: () => void;
   disabled: boolean;
 }
 
 export const Header = ({
   className,
+  chat,
   selectedModel,
-  models,
   onChangeModel,
-  onRemoveHistory,
+  onRemoveChat,
   onToggleSideMenu,
   disabled,
 }: HeaderProps) => {
   return (
     <div className={cx('Header', 'relative z-30 w-full h-12 bg-surface', className)}>
-      <div className="w-full h-full px-2 mx-auto grid grid-cols-[1fr_auto_1fr] items-center justify-between">
+      <div className="w-full h-12 px-2 mx-auto grid grid-cols-[1fr_auto_1fr] items-center justify-between">
         <div className="flex justify-start gap-1">
           <button
             type="button"
@@ -35,11 +36,15 @@ export const Header = ({
             <FiSidebar className="w-6 h-6" title="Settings" />
           </button>
         </div>
-        <div className="flex justify-center h-full p-2 box-border">
-          <ModelSelector selectedModel={selectedModel} models={models} onChange={onChangeModel} disabled={disabled} />
+        <div className="flex justify-center h-full box-border">
+          <ModelSelector
+            selectedModelName={selectedModel?.name ?? chat?.modelName}
+            onChange={onChangeModel}
+            disabled={disabled}
+          />
         </div>
         <div className="flex justify-end gap-1">
-          <HeaderMenu disabled={disabled} onClickRemoveHistory={onRemoveHistory} />
+          <HeaderMenu disabled={disabled} onClickRemoveChat={onRemoveChat} />
         </div>
       </div>
     </div>

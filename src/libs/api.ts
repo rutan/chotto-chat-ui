@@ -1,28 +1,18 @@
-import { z } from 'zod';
+import { type OllamaMessage, type OllamaModel, ollamaModelSchema } from '../entities';
 
 export interface ApiConfig {
   url: string;
 }
 
-export const modelSchema = z.object({
-  name: z.string(),
-});
-export type Model = z.infer<typeof modelSchema>;
-
-export async function fetchListModels(config: ApiConfig) {
+export async function fetchListModels(config: ApiConfig): Promise<OllamaModel[]> {
   const json = await fetch(`${config.url}/api/tags`).then((resp) => resp.json());
-  return json.models.map((model: unknown) => modelSchema.parse(model));
-}
-
-export interface ChatMessage {
-  role: 'user' | 'assistant' | 'system';
-  content: string;
+  return json.models.map((model: unknown) => ollamaModelSchema.parse(model));
 }
 
 export function postChatStream(
   config: ApiConfig,
   modelName: string,
-  messages: ChatMessage[],
+  messages: OllamaMessage[],
   options?: {
     signal?: AbortSignal;
   },

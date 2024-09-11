@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import type { AppSettings } from '../db';
+import type { AppSettings } from '../entities';
 
 export function useDarkMode(appSettings: AppSettings) {
   useEffect(() => {

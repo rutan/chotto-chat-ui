@@ -1,9 +1,9 @@
-import type { ChatMessage } from '../libs';
+import { Message, type OllamaMessage } from '../entities';
 import { ChatBalloon } from './ChatBalloon';
 import { Spinner } from './Spinner';
 
 export interface ChatBalloonOfGeneratingMessageProps {
-  message: ChatMessage;
+  message: OllamaMessage;
 }
 
 export const ChatBalloonOfGeneratingMessage = ({ message }: ChatBalloonOfGeneratingMessageProps) => {
