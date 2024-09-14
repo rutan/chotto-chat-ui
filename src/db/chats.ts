@@ -41,5 +41,8 @@ export async function saveChat(db: Database, chat: Chat): Promise<void> {
 }
 
 export async function removeChat(db: Database, chat: Chat): Promise<void> {
-  await db.chats.delete(chat.id);
+  await db.transaction('rw', db.messages, db.chats, async () => {
+    await db.messages.where({ chatId: chat.id }).delete();
+    await db.chats.delete(chat.id);
+  });
 }
