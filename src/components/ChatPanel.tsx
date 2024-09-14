@@ -41,6 +41,7 @@ export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu
 
       const newChatData = initChat({
         modelName: currentModel.name,
+        title: message.content.split('\n')[0].trim(),
       });
       const systemPromptMessage = initMessage({
         chatId: newChatData.id,

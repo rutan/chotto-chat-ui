@@ -1,6 +1,11 @@
 {
   "ChatEditForm.cancel": "Cancel",
   "ChatEditForm.submit": "Submit",
+  "ChatList.label.today": "Today",
+  "ChatList.label.thisWeek": "7 Days",
+  "ChatList.label.thisMonth": "30 Days",
+  "ChatList.label.thisYear": "1 Year",
+  "ChatList.label.older": "Older",
   "ChatTextArea.placeholder": "Type a message...",
   "HeaderMenu.removeChat": "Remove Chat",
   "ModelSelector.selectModel": "Select Model...",

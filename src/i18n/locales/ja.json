@@ -1,6 +1,11 @@
 {
   "ChatEditForm.cancel": "キャンセル",
   "ChatEditForm.submit": "送信",
+  "ChatList.label.today": "今日",
+  "ChatList.label.thisWeek": "7日以内",
+  "ChatList.label.thisMonth": "30日以内",
+  "ChatList.label.thisYear": "1年以内",
+  "ChatList.label.older": "それ以前",
   "ChatTextArea.placeholder": "AIにメッセージを入力...",
   "HeaderMenu.removeChat": "この会話を削除",
   "ModelSelector.selectModel": "モデルを選択...",

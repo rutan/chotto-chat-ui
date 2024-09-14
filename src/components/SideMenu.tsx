@@ -4,6 +4,7 @@ import { MdAdd, MdSettings } from 'react-icons/md';
 import type { Chat } from '../entities';
 import { useChats } from '../hooks';
 import { cx } from '../libs';
+import { ChatList } from './ChatList';
 import { SettingDialog } from './SettingDialog';
 
 export type SideMenuProps = {
@@ -41,19 +42,13 @@ export const SideMenu = ({ className, chat: currentChat, onNewChat, onSelectChat
             {t('SideMenu.newChat')}
           </ToolButton>
         </div>
-        <div className="overflow-auto">
-          {chats.map((chat) => (
-            <ToolButton
-              key={chat.id}
-              type="button"
-              selected={chat.id === currentChat?.id}
-              onClick={() => onSelectChat(chat)}
-              disabled={disabled}
-            >
-              {chat.title || chat.createdAt.toISOString()}
-            </ToolButton>
-          ))}
-        </div>
+        <ChatList
+          className="overflow-auto px-2"
+          chats={chats}
+          currentChat={currentChat}
+          onSelectChat={onSelectChat}
+          disabled={disabled}
+        />
         <div className="p-2">
           <ToolButton type="button" onClick={handleOpenSettingModal} disabled={disabled}>
             <MdSettings className="w-6 h-6" />
@@ -66,16 +61,10 @@ export const SideMenu = ({ className, chat: currentChat, onNewChat, onSelectChat
   );
 };
 
-const ToolButton = ({
-  className,
-  selected,
-  children,
-  ...rest
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { selected?: boolean }) => (
+const ToolButton = ({ className, children, ...rest }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   <button
     className={cx(
-      'flex items-center gap-2 w-full rounded p-4 disabled:opacity-50 disabled:cursor-not-allowed',
-      selected ? 'bg-surface-dim' : 'bg-transparent disabled:bg-transparent hover:bg-surface-dim',
+      'flex items-center gap-2 w-full rounded p-4 disabled:opacity-50 disabled:cursor-not-allowed bg-transparent disabled:bg-transparent hover:bg-surface-dim',
       className,
     )}
     {...rest}
