@@ -6,9 +6,10 @@ import { ModelSelector } from './ModelSelector';
 
 export interface HeaderProps {
   className?: string;
-  chat?: Chat | null;
+  chat: Chat;
   selectedModel: OllamaModel | null;
   onChangeModel: (model: OllamaModel | null) => void;
+  onUpdateChat: (chat: Chat) => void;
   onRemoveChat: () => void;
   onToggleSideMenu?: () => void;
   disabled: boolean;
@@ -19,6 +20,7 @@ export const Header = ({
   chat,
   selectedModel,
   onChangeModel,
+  onUpdateChat,
   onRemoveChat,
   onToggleSideMenu,
   disabled,
@@ -38,13 +40,13 @@ export const Header = ({
         </div>
         <div className="flex justify-center h-full box-border">
           <ModelSelector
-            selectedModelName={selectedModel?.name ?? chat?.modelName}
+            selectedModelName={selectedModel?.name ?? chat.modelName}
             onChange={onChangeModel}
             disabled={disabled}
           />
         </div>
         <div className="flex justify-end gap-1">
-          <HeaderMenu disabled={disabled} onClickRemoveChat={onRemoveChat} />
+          <HeaderMenu chat={chat} disabled={disabled} onUpdateChat={onUpdateChat} onClickRemoveChat={onRemoveChat} />
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ export * from './ChatEditForm';
 export * from './ChatForm';
 export * from './ChatList';
 export * from './ChatPanel';
+export * from './ChatSettingDialog';
 export * from './Header';
 export * from './HeaderMenu';
 export * from './ModelSelector';

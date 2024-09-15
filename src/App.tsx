@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { ChatPanel, SideMenu } from './components';
-import type { Chat } from './entities';
+import { type Chat, initChat } from './entities';
 import { useAppSettings, useDarkMode, useLocale, useSideMenu } from './hooks';
 import { cx } from './libs';
 
@@ -12,7 +12,8 @@ export const App: React.FC = () => {
   const [chat, setChat] = useState<Chat | null>(null);
 
   const handleOpenNewChat = useCallback(() => {
-    setChat(null);
+    const chat = initChat();
+    setChat(chat);
   }, []);
 
   const handleSetChat = useCallback((chat: Chat | null) => {
@@ -45,16 +46,18 @@ export const App: React.FC = () => {
       >
         <SideMenu onNewChat={handleOpenNewChat} chat={chat} onSelectChat={handleSetChat} />
       </div>
-      <ChatPanel
-        key={chat?.id ?? 'new-chat'}
-        className={cx(
-          'flex flex-col h-full flex-1 transition-padding duration-200',
-          isShowSideMenu ? 'md:pl-64' : 'md:pl-0',
-        )}
-        chat={chat}
-        onChangeChat={handleSetChat}
-        onClickToggleSideMenu={handleToggleSideMenu}
-      />
+      {chat ? (
+        <ChatPanel
+          key={chat.id}
+          className={cx(
+            'flex flex-col h-full flex-1 transition-padding duration-200',
+            isShowSideMenu ? 'md:pl-64' : 'md:pl-0',
+          )}
+          chat={chat}
+          onChangeChat={handleSetChat}
+          onClickToggleSideMenu={handleToggleSideMenu}
+        />
+      ) : null}
     </div>
   );
 };

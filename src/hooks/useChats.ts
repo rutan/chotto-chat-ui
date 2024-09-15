@@ -1,5 +1,5 @@
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { createChat, loadChats, removeChat } from '../db';
+import { QueryClient, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { createChat, loadChats, removeChat, saveChat } from '../db';
 import type { Chat, Message } from '../entities';
 import { useDatabase } from './useDatabase';
 
@@ -67,6 +67,31 @@ export function useCreateChatMutation() {
         }) => {
           return {
             pages: prev.pages.map((page) => [...page, chat]),
+            pageParams: prev.pageParams,
+          };
+        },
+      );
+    },
+  });
+}
+
+export function useUpdateChatMutation() {
+  const database = useDatabase();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (chat: Chat) => {
+      return saveChat(database, chat);
+    },
+    onSuccess: (chat) => {
+      queryClient.setQueryData(
+        ['chats'],
+        (prev: {
+          pages: Chat[][];
+          pageParams: number[];
+        }) => {
+          return {
+            pages: prev.pages.map((page) => [...page.filter((c) => c.id !== chat.id), chat]),
             pageParams: prev.pageParams,
           };
         },

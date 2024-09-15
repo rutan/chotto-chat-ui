@@ -5,6 +5,7 @@ export const chatSchema = object({
   id: string(),
   title: string(),
   modelName: string(),
+  systemPrompt: string(),
   createdAt: date(),
   updatedAt: date(),
 });
@@ -16,8 +17,13 @@ export function initChat(params: Partial<Chat> = {}): Chat {
     id: uuidV4(),
     title: '',
     modelName: '',
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    systemPrompt: '',
+    createdAt: new Date(0),
+    updatedAt: new Date(0),
     ...params,
   });
+}
+
+export function isNewChat(chat: Chat): boolean {
+  return chat.createdAt.getTime() === 0;
 }

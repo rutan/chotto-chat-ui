@@ -2,19 +2,18 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { v4 as uuidV4 } from 'uuid';
 import { loadMessages, saveMessages } from '../db';
-import type { Message, OllamaMessage } from '../entities';
+import type { Chat, Message, OllamaMessage } from '../entities';
 import { postChatStream } from '../libs';
 import { useAppSettings } from './useAppSettings';
 import { useDatabase } from './useDatabase';
 
-export function useMessages(chatId?: string | null) {
+export function useMessages(chat: Chat) {
   const database = useDatabase();
 
   return useQuery({
-    queryKey: ['messages', chatId],
+    queryKey: ['messages', chat.id],
     queryFn: () => {
-      if (!chatId) return [];
-      return loadMessages(database, chatId);
+      return loadMessages(database, chat.id);
     },
     select: (data: Message[]) => {
       const systemMessage = data.find((message) => message.role === 'system');
@@ -29,21 +28,19 @@ export function useMessages(chatId?: string | null) {
         messages: walkActiveMessages(data, systemMessage.id),
       };
     },
-    enabled: !!chatId,
   });
 }
 
-export function useMessageMutation(chatId?: string | null) {
+export function useMessageMutation(chat: Chat) {
   const database = useDatabase();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (messages: Message[]) => {
-      if (!chatId) throw new Error('chatId is required');
       return saveMessages(database, messages);
     },
     onSuccess: (_, messages) => {
-      queryClient.setQueryData(['messages', chatId], (prev: Message[]) => {
+      queryClient.setQueryData(['messages', chat.id], (prev: Message[]) => {
         return [
           ...prev.filter((message) => {
             return !messages.some((newMessage) => newMessage.id === message.id);
@@ -56,10 +53,10 @@ export function useMessageMutation(chatId?: string | null) {
 }
 
 export function useMessagesWithGenerator({
-  chatId,
+  chat,
   modelName,
 }: {
-  chatId?: string | null;
+  chat: Chat;
   modelName?: string;
 }) {
   const [appSettings] = useAppSettings();
@@ -69,18 +66,17 @@ export function useMessagesWithGenerator({
   const [generatingMessage, setGeneratingMessage] = useState<OllamaMessage | null>(null);
   const lastMessageIdRef = useRef<string>('');
 
-  const { data = { allMessages: [], messages: [] }, isLoading, isFetching } = useMessages(chatId);
-  const updateMessagesMutation = useMessageMutation(chatId);
+  const { data = { allMessages: [], messages: [] }, isLoading, isFetching, refetch } = useMessages(chat);
+  const updateMessagesMutation = useMessageMutation(chat);
 
   const addChildMessage = useCallback(
     async (targetMessage: Message, { role, content }: { role: Message['role']; content: Message['content'] }) => {
-      if (!chatId) throw new Error('chatId is required');
       if (!data.allMessages.some((message) => message.id === targetMessage.id))
         throw new Error('targetMessage not found');
 
       const newMessage = {
         id: uuidV4(),
-        chatId: chatId,
+        chatId: chat.id,
         role,
         content,
         previousId: targetMessage.id,
@@ -92,31 +88,28 @@ export function useMessagesWithGenerator({
 
       updateMessagesMutation.mutate([targetMessage, newMessage]);
     },
-    [chatId, data, updateMessagesMutation],
+    [chat, data, updateMessagesMutation],
   );
 
   const addNewMessage = useCallback(
     async ({ role, content }: { role: Message['role']; content: Message['content'] }) => {
-      if (!chatId) throw new Error('chatId is required');
-
       const lastMessage = data.messages[data.messages.length - 1];
       if (!lastMessage) throw new Error('System message not found');
 
       return addChildMessage(lastMessage, { role, content });
     },
-    [chatId, data, addChildMessage],
+    [data, addChildMessage],
   );
 
   const changeBranch = useCallback(
     async (targetMessage: Message, newNextId: string) => {
-      if (!chatId) throw new Error('chatId is required');
       if (!data.allMessages.some((message) => message.id === targetMessage.id))
         throw new Error('targetMessage not found');
 
       targetMessage.currentNextId = newNextId;
       updateMessagesMutation.mutate([targetMessage]);
     },
-    [chatId, data, updateMessagesMutation],
+    [data, updateMessagesMutation],
   );
 
   useEffect(() => {
@@ -152,7 +145,7 @@ export function useMessagesWithGenerator({
           modelName,
           data.messages.map((message) => ({
             role: message.role,
-            content: message.role === 'system' ? message.content || appSettings.defaultSystemPrompt : message.content,
+            content: message.role === 'system' ? chat.systemPrompt || appSettings.defaultSystemPrompt : message.content,
           })),
           {
             signal: controller.signal,
@@ -192,7 +185,7 @@ export function useMessagesWithGenerator({
         setGeneratingMessage(null);
       }
     })();
-  }, [modelName, isGenerating, data, appSettings, addNewMessage]);
+  }, [chat, modelName, isGenerating, data, appSettings, addNewMessage]);
 
   const abortGenerate = useCallback(() => {
     if (abortControllerRef.current) {
@@ -212,6 +205,7 @@ export function useMessagesWithGenerator({
     isGenerating,
     generateError,
     abortGenerate,
+    refetchMessages: refetch,
   };
 }
 

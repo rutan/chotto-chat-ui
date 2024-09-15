@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
-import { type Chat, type OllamaMessage, type OllamaModel, initChat, initMessage } from '../entities';
-import { useCreateChatMutation, useRemoveChatMutation } from '../hooks';
+import { type Chat, type OllamaMessage, type OllamaModel, initChat, initMessage, isNewChat } from '../entities';
+import { useCreateChatMutation, useRemoveChatMutation, useUpdateChatMutation } from '../hooks';
 import { useMessagesWithGenerator } from '../hooks';
 import { ChatBalloonList } from './ChatBalloonList';
 import { ChatForm } from './ChatForm';
@@ -8,7 +8,7 @@ import { Header } from './Header';
 
 export interface ChatPanelProps {
   className?: string;
-  chat?: Chat | null;
+  chat: Chat;
   onChangeChat: (chat: Chat | null) => void;
   onClickToggleSideMenu: () => void;
 }
@@ -16,6 +16,7 @@ export interface ChatPanelProps {
 export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu }: ChatPanelProps) => {
   const [currentModel, setCurrentModel] = useState<OllamaModel | null>(null);
   const createChatMutation = useCreateChatMutation();
+  const updateChatMutation = useUpdateChatMutation();
   const removeChatMutation = useRemoveChatMutation();
 
   const {
@@ -26,8 +27,9 @@ export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu
     isGenerating,
     generatingMessage,
     abortGenerate: cancelChat,
+    refetchMessages,
   } = useMessagesWithGenerator({
-    chatId: chat?.id,
+    chat,
     modelName: currentModel?.name ?? '',
   });
   const [isBusy, setIsBusy] = useState(false);
@@ -39,10 +41,11 @@ export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu
 
       setIsBusy(true);
 
-      const newChatData = initChat({
+      const newChatData = {
+        ...chat,
         modelName: currentModel.name,
         title: message.content.split('\n')[0].trim(),
-      });
+      };
       const systemPromptMessage = initMessage({
         chatId: newChatData.id,
         role: 'system',
@@ -61,30 +64,40 @@ export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu
         {
           onSuccess: ({ chat }) => {
             onChangeChat(chat);
+            refetchMessages();
             setIsBusy(false);
           },
         },
       );
     },
-    [isBusy, createChatMutation, onChangeChat, currentModel],
+    [isBusy, chat, createChatMutation, onChangeChat, currentModel, refetchMessages],
   );
 
   const handleSendMessage = useCallback(
     async (message: string) => {
       const userMessage = { role: 'user', content: message } as const;
 
-      if (chat) {
-        addNewMessage(userMessage);
-      } else {
+      if (isNewChat(chat)) {
         await handleRegisterChat(userMessage);
+      } else {
+        addNewMessage(userMessage);
       }
     },
     [chat, addNewMessage, handleRegisterChat],
   );
 
-  const handleRemoveChat = useCallback(() => {
-    if (!chat) return;
+  const handleUpdateChat = useCallback(
+    (chat: Chat) => {
+      updateChatMutation.mutateAsync(chat, {
+        onSuccess: (updatedChat) => {
+          onChangeChat(updatedChat);
+        },
+      });
+    },
+    [onChangeChat, updateChatMutation],
+  );
 
+  const handleRemoveChat = useCallback(() => {
     removeChatMutation.mutateAsync(chat);
     onChangeChat(null);
   }, [chat, onChangeChat, removeChatMutation]);
@@ -96,6 +109,7 @@ export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu
         chat={chat}
         selectedModel={currentModel}
         onChangeModel={setCurrentModel}
+        onUpdateChat={handleUpdateChat}
         onRemoveChat={handleRemoveChat}
         onToggleSideMenu={onClickToggleSideMenu}
         disabled={isGenerating}

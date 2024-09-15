@@ -1,4 +1,4 @@
-import { type Chat, type Message, chatSchema } from '../entities';
+import { type Chat, type Message, chatSchema, isNewChat } from '../entities';
 import type { Database } from './database';
 import { saveMessages } from './messages';
 
@@ -25,19 +25,42 @@ export async function loadChats(
 }
 
 export async function createChat(db: Database, chat: Chat, messages: Message[]) {
-  await db.transaction('rw', db.messages, db.chats, async () => {
-    await db.chats.add(chat);
-    await saveMessages(db, messages);
-  });
+  const oldCreatedAt = chat.createdAt;
+  const oldUpdatedAt = chat.updatedAt;
 
-  return {
-    chat,
-    messages,
-  };
+  try {
+    await db.transaction('rw', db.messages, db.chats, async () => {
+      if (isNewChat(chat)) chat.createdAt = new Date();
+      chat.updatedAt = new Date();
+
+      await db.chats.add(chat);
+      await saveMessages(db, messages);
+    });
+
+    return {
+      chat,
+      messages,
+    };
+  } catch (e) {
+    chat.createdAt = oldCreatedAt;
+    chat.updatedAt = oldUpdatedAt;
+
+    throw e;
+  }
 }
 
-export async function saveChat(db: Database, chat: Chat): Promise<void> {
-  await db.chats.put(chat);
+export async function saveChat(db: Database, chat: Chat) {
+  const oldUpdatedAt = chat.updatedAt;
+
+  try {
+    chat.updatedAt = new Date();
+    await db.chats.put(chat);
+    return chat;
+  } catch (e) {
+    chat.updatedAt = oldUpdatedAt;
+
+    throw e;
+  }
 }
 
 export async function removeChat(db: Database, chat: Chat): Promise<void> {
