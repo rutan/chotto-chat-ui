@@ -1,15 +1,15 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ChatPanel, SideMenu } from './components';
 import { type Chat, initChat } from './entities';
 import { useAppSettings, useDarkMode, useLocale, useSideMenu } from './hooks';
-import { cx } from './libs';
+import { cx, isSmallViewport } from './libs';
 
 export const App: React.FC = () => {
   const [appSettings] = useAppSettings();
   useDarkMode(appSettings);
   useLocale(appSettings);
   const [isShowSideMenu, setIsShowSideMenu] = useSideMenu();
-  const [chat, setChat] = useState<Chat | null>(null);
+  const [chat, setChat] = useState<Chat>(initChat());
 
   const handleOpenNewChat = useCallback(() => {
     const chat = initChat();
@@ -17,7 +17,7 @@ export const App: React.FC = () => {
   }, []);
 
   const handleSetChat = useCallback((chat: Chat | null) => {
-    setChat(chat);
+    setChat(chat || initChat());
   }, []);
 
   const handleToggleSideMenu = useCallback(() => {
@@ -27,6 +27,13 @@ export const App: React.FC = () => {
   const handleCloseSideMenu = useCallback(() => {
     setIsShowSideMenu(false);
   }, [setIsShowSideMenu]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies(chat): switch sideBar when change chat
+  useEffect(() => {
+    if (isSmallViewport()) {
+      setIsShowSideMenu(false);
+    }
+  }, [chat, setIsShowSideMenu]);
 
   return (
     <div className="flex w-full h-full">
@@ -46,18 +53,16 @@ export const App: React.FC = () => {
       >
         <SideMenu onNewChat={handleOpenNewChat} chat={chat} onSelectChat={handleSetChat} />
       </div>
-      {chat ? (
-        <ChatPanel
-          key={chat.id}
-          className={cx(
-            'flex flex-col h-full flex-1 transition-padding duration-200',
-            isShowSideMenu ? 'md:pl-64' : 'md:pl-0',
-          )}
-          chat={chat}
-          onChangeChat={handleSetChat}
-          onClickToggleSideMenu={handleToggleSideMenu}
-        />
-      ) : null}
+      <ChatPanel
+        key={chat.id}
+        className={cx(
+          'flex flex-col h-full flex-1 transition-padding duration-200',
+          isShowSideMenu ? 'md:pl-64' : 'md:pl-0',
+        )}
+        chat={chat}
+        onChangeChat={handleSetChat}
+        onClickToggleSideMenu={handleToggleSideMenu}
+      />
     </div>
   );
 };

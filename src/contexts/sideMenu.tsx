@@ -1,4 +1,5 @@
 import { type ReactNode, createContext, useEffect, useState } from 'react';
+import { isSmallViewport } from '../libs';
 
 type RealSetIsShowSideMenu = (isShowSideMenu: boolean | ((prev: boolean) => boolean)) => void;
 
@@ -9,10 +10,10 @@ export const SideMenuProvider = ({ children }: { children?: ReactNode }) => {
   const [isShowSideMenu, setIsShowSideMenu] = useState(false);
 
   useEffect(() => {
-    if (window.innerWidth >= 768) {
-      setIsShowSideMenu(true);
-    } else {
+    if (isSmallViewport()) {
       setIsShowSideMenu(false);
+    } else {
+      setIsShowSideMenu(true);
     }
     setIsReady(true);
   }, []);
