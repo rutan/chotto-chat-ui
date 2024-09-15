@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { v4 as uuidV4 } from 'uuid';
 import { loadMessages, saveMessages } from '../db';
 import type { Chat, Message, OllamaMessage } from '../entities';
@@ -7,11 +7,25 @@ import { postChatStream } from '../libs';
 import { useAppSettings } from './useAppSettings';
 import { useDatabase } from './useDatabase';
 
+function generateMessageQueryKey(chat: Chat) {
+  return ['messages', chat.id];
+}
+
+function walkActiveMessages(messages: Message[], seekId: string): Message[] {
+  const message = messages.find((message) => message.id === seekId);
+  if (!message) return [];
+
+  const nextId = message.currentNextId;
+  if (nextId === undefined) return [message];
+
+  return [message, ...walkActiveMessages(messages, nextId)];
+}
+
 export function useMessages(chat: Chat) {
   const database = useDatabase();
 
-  return useQuery({
-    queryKey: ['messages', chat.id],
+  const { data = { allMessages: [], messages: [] }, ...rest } = useQuery({
+    queryKey: generateMessageQueryKey(chat),
     queryFn: () => {
       return loadMessages(database, chat.id);
     },
@@ -29,44 +43,7 @@ export function useMessages(chat: Chat) {
       };
     },
   });
-}
 
-export function useMessageMutation(chat: Chat) {
-  const database = useDatabase();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (messages: Message[]) => {
-      return saveMessages(database, messages);
-    },
-    onSuccess: (_, messages) => {
-      queryClient.setQueryData(['messages', chat.id], (prev: Message[]) => {
-        return [
-          ...prev.filter((message) => {
-            return !messages.some((newMessage) => newMessage.id === message.id);
-          }),
-          ...messages,
-        ];
-      });
-    },
-  });
-}
-
-export function useMessagesWithGenerator({
-  chat,
-  modelName,
-}: {
-  chat: Chat;
-  modelName?: string;
-}) {
-  const [appSettings] = useAppSettings();
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generateError, setGenerateError] = useState<unknown | null>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const [generatingMessage, setGeneratingMessage] = useState<OllamaMessage | null>(null);
-  const lastMessageIdRef = useRef<string>('');
-
-  const { data = { allMessages: [], messages: [] }, isLoading, isFetching, refetch } = useMessages(chat);
   const updateMessagesMutation = useMessageMutation(chat);
 
   const addChildMessage = useCallback(
@@ -112,18 +89,47 @@ export function useMessagesWithGenerator({
     [data, updateMessagesMutation],
   );
 
+  return {
+    allMessages: data.allMessages,
+    messages: data.messages,
+    ...rest,
+    addNewMessage,
+    addChildMessage,
+    changeBranch,
+  };
+}
+
+export function useMessageGenerator({
+  chat,
+  messages,
+  onGenerateComplete,
+  enabled = true,
+}: {
+  chat: Chat;
+  messages: Message[];
+  onGenerateComplete?: (message: OllamaMessage) => void;
+  enabled?: boolean;
+}) {
+  const [appSettings] = useAppSettings();
+  const [generatingMessage, setGeneratingMessage] = useState<OllamaMessage | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState<unknown | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const abort = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+  }, []);
+
   useEffect(() => {
-    if (!modelName) return;
+    if (!enabled) return;
     if (isGenerating) return;
-    if (data.messages.length <= 1) return;
-    if (lastMessageIdRef.current === data.messages[data.messages.length - 1]?.id) return;
+    if (messages.length < 2) return;
 
-    const lastMessage = data.messages[data.messages.length - 1];
+    const lastMessage = messages[messages.length - 1];
     if (lastMessage.role !== 'user') return;
-
-    setIsGenerating(true);
-    setGenerateError(null);
-    lastMessageIdRef.current = lastMessage.id;
 
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -132,18 +138,19 @@ export function useMessagesWithGenerator({
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
-    (async () => {
-      const responseMessage = { role: 'assistant' as const, content: '' };
-      setGeneratingMessage({ ...responseMessage });
+    setIsGenerating(true);
 
+    const responseMessage = { role: 'assistant' as const, content: '' };
+    setGeneratingMessage({ ...responseMessage });
+
+    (async () => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
         const reader = await postChatStream(
           {
             url: appSettings.apiEndpoint,
           },
-          modelName,
-          data.messages.map((message) => ({
+          chat.modelName,
+          messages.map((message) => ({
             role: message.role,
             content: message.role === 'system' ? chat.systemPrompt || appSettings.defaultSystemPrompt : message.content,
           })),
@@ -167,14 +174,14 @@ export function useMessagesWithGenerator({
           }
 
           if (done) {
-            addNewMessage(responseMessage);
+            onGenerateComplete?.(responseMessage);
             break;
           }
         }
       } catch (e) {
         if (e instanceof Error && e.name === 'AbortError') {
           console.log('Request aborted');
-          addNewMessage(responseMessage);
+          onGenerateComplete?.(responseMessage);
           return;
         }
         console.error(e);
@@ -185,36 +192,53 @@ export function useMessagesWithGenerator({
         setGeneratingMessage(null);
       }
     })();
-  }, [chat, modelName, isGenerating, data, appSettings, addNewMessage]);
-
-  const abortGenerate = useCallback(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
-  }, []);
+  }, [enabled, appSettings, chat, messages, isGenerating, onGenerateComplete]);
 
   return {
-    ...data,
-    isLoading,
-    isFetching,
-    addNewMessage,
-    addChildMessage,
-    changeBranch,
     generatingMessage,
     isGenerating,
     generateError,
-    abortGenerate,
-    refetchMessages: refetch,
+    abort,
   };
 }
 
-function walkActiveMessages(messages: Message[], seekId: string): Message[] {
-  const message = messages.find((message) => message.id === seekId);
-  if (!message) return [];
+export function useMessageMutation(chat: Chat) {
+  const database = useDatabase();
+  const queryClient = useQueryClient();
 
-  const nextId = message.currentNextId;
-  if (nextId === undefined) return [message];
+  const applyMessageToCache = useCallback(
+    (messages: Message[]) => {
+      queryClient.setQueryData(generateMessageQueryKey(chat), (prev: Message[]) => {
+        return [
+          ...prev.filter((message) => {
+            return !messages.some((newMessage) => newMessage.id === message.id);
+          }),
+          ...messages,
+        ];
+      });
+    },
+    [queryClient, chat],
+  );
 
-  return [message, ...walkActiveMessages(messages, nextId)];
+  return useMutation({
+    mutationFn: (messages: Message[]) => {
+      return saveMessages(database, messages);
+    },
+    onMutate: async (messages) => {
+      const queryKey = generateMessageQueryKey(chat);
+      await queryClient.cancelQueries({ queryKey });
+      const prevData = queryClient.getQueryData(queryKey);
+      applyMessageToCache(messages);
+
+      return { prevData };
+    },
+    onSuccess: (_, messages) => {
+      applyMessageToCache(messages);
+    },
+    onError: (_, __, context) => {
+      if (context?.prevData) {
+        queryClient.setQueryData(generateMessageQueryKey(chat), context.prevData);
+      }
+    },
+  });
 }

@@ -1,7 +1,12 @@
 import { useCallback, useState } from 'react';
-import { type Chat, type OllamaMessage, type OllamaModel, initChat, initMessage, isNewChat } from '../entities';
-import { useCreateChatMutation, useRemoveChatMutation, useUpdateChatMutation } from '../hooks';
-import { useMessagesWithGenerator } from '../hooks';
+import { type Chat, type Message, type OllamaMessage, type OllamaModel, initMessage, isNewChat } from '../entities';
+import {
+  useCreateChatMutation,
+  useMessageGenerator,
+  useMessages,
+  useRemoveChatMutation,
+  useUpdateChatMutation,
+} from '../hooks';
 import { ChatBalloonList } from './ChatBalloonList';
 import { ChatForm } from './ChatForm';
 import { Header } from './Header';
@@ -18,21 +23,43 @@ export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu
   const createChatMutation = useCreateChatMutation();
   const updateChatMutation = useUpdateChatMutation();
   const removeChatMutation = useRemoveChatMutation();
+  const [isAllowGenerate, setIsAllowGenerate] = useState(false);
+
+  const { messages, addNewMessage, changeBranch, addChildMessage, refetch: refetchMessages } = useMessages(chat);
+
+  const handleGenerateComplete = useCallback(
+    (message: OllamaMessage) => {
+      setIsAllowGenerate(false);
+      addNewMessage(message);
+    },
+    [addNewMessage],
+  );
 
   const {
-    messages,
-    addNewMessage,
-    changeBranch,
-    addChildMessage,
     isGenerating,
     generatingMessage,
-    abortGenerate: cancelChat,
-    refetchMessages,
-  } = useMessagesWithGenerator({
+    abort: cancelChat,
+  } = useMessageGenerator({
     chat,
-    modelName: currentModel?.name ?? '',
+    messages,
+    onGenerateComplete: handleGenerateComplete,
+    enabled: isAllowGenerate,
   });
+
   const [isBusy, setIsBusy] = useState(false);
+
+  const handleChangeModel = useCallback(
+    (model: OllamaModel | null) => {
+      setCurrentModel(model);
+      if (!model || chat.modelName === model.name) return;
+
+      handleUpdateChat({
+        ...chat,
+        modelName: model.name,
+      });
+    },
+    [chat],
+  );
 
   const handleRegisterChat = useCallback(
     async (message: OllamaMessage) => {
@@ -44,7 +71,7 @@ export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu
       const newChatData = {
         ...chat,
         modelName: currentModel.name,
-        title: message.content.split('\n')[0].trim(),
+        title: chat.title || message.content.split('\n')[0].trim(),
       };
       const systemPromptMessage = initMessage({
         chatId: newChatData.id,
@@ -80,14 +107,36 @@ export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu
       if (isNewChat(chat)) {
         await handleRegisterChat(userMessage);
       } else {
-        addNewMessage(userMessage);
+        await addNewMessage(userMessage);
       }
+
+      setIsAllowGenerate(true);
     },
     [chat, addNewMessage, handleRegisterChat],
   );
 
+  const handleAddChildMessage = useCallback(
+    async (targetMessage: Message, child: OllamaMessage) => {
+      await addChildMessage(targetMessage, child);
+      setIsAllowGenerate(true);
+    },
+    [addChildMessage],
+  );
+
+  const handleChangeBranch = useCallback(
+    async (targetMessage: Message, newNextId: string) => {
+      await changeBranch(targetMessage, newNextId);
+    },
+    [changeBranch],
+  );
+
   const handleUpdateChat = useCallback(
     (chat: Chat) => {
+      if (isNewChat(chat)) {
+        onChangeChat(chat);
+        return;
+      }
+
       updateChatMutation.mutateAsync(chat, {
         onSuccess: (updatedChat) => {
           onChangeChat(updatedChat);
@@ -108,7 +157,7 @@ export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu
         className="shrink-0"
         chat={chat}
         selectedModel={currentModel}
-        onChangeModel={setCurrentModel}
+        onChangeModel={handleChangeModel}
         onUpdateChat={handleUpdateChat}
         onRemoveChat={handleRemoveChat}
         onToggleSideMenu={onClickToggleSideMenu}
@@ -117,8 +166,8 @@ export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu
       <ChatBalloonList
         messages={messages}
         generatingMessage={generatingMessage}
-        onAddChildMessage={addChildMessage}
-        onChangeBranch={changeBranch}
+        onAddChildMessage={handleAddChildMessage}
+        onChangeBranch={handleChangeBranch}
         disabled={isGenerating}
       />
       {currentModel && (

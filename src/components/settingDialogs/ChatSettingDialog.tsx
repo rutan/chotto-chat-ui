@@ -1,5 +1,5 @@
 import { DialogTitle } from '@headlessui/react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Chat } from '../../entities';
 import { useAppSettings } from '../../hooks';
@@ -35,6 +35,13 @@ export const ChatSettingDialog = ({ chat, onUpdateChat, isOpen, onClose }: ChatS
     });
     onClose();
   }, [chat, onClose, onUpdateChat, tmpTitle, tmpSystemPrompt]);
+
+  useEffect(() => {
+    if (isOpen) return;
+
+    setTmpTitle(chat.title);
+    setTmpSystemPrompt(chat.systemPrompt);
+  }, [chat, isOpen]);
 
   return (
     <BaseSettingDialog isOpen={isOpen} onClose={handleClose}>
