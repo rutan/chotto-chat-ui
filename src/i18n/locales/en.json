@@ -1,4 +1,5 @@
 {
+  "BaseSettingDialog.close": "Close",
   "ChatEditForm.cancel": "Cancel",
   "ChatEditForm.submit": "Submit",
   "ChatList.label.today": "Today",
@@ -9,7 +10,6 @@
   "ChatSettingDialog.title": "Title",
   "ChatSettingDialog.title.placeholder": "Chat Title",
   "ChatSettingDialog.systemPrompt": "System Prompt",
-  "ChatSettingDialog.close": "Close",
   "ChatTextArea.placeholder": "Type a message...",
   "HeaderMenu.settingChat": "Chat Setting",
   "HeaderMenu.removeChat": "Remove Chat",
@@ -27,7 +27,6 @@
   "SettingDialog.colorTheme.dark": "Dark Mode",
   "SettingDialog.defaultSystemPrompt": "Default System Prompt",
   "SettingDialog.defaultSystemPrompt.placeholder": "You are assistant bot.",
-  "SettingDialog.close": "Close",
   "SideMenu.newChat": "New Chat",
   "SideMenu.settings": "Settings"
 }

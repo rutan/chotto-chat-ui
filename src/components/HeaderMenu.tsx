@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { MdDelete, MdMoreVert, MdSettings } from 'react-icons/md';
 import type { Chat } from '../entities';
 import { cx } from '../libs';
-import { ChatSettingDialog } from './ChatSettingDialog';
+import { ChatSettingDialog } from './settingDialogs';
 
 export interface HeaderMenuProps {
   chat: Chat;

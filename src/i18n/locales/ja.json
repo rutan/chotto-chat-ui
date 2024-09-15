@@ -1,4 +1,5 @@
 {
+  "BaseSettingDialog.close": "閉じる",
   "ChatEditForm.cancel": "キャンセル",
   "ChatEditForm.submit": "送信",
   "ChatList.label.today": "今日",
@@ -9,7 +10,6 @@
   "ChatSettingDialog.title": "会話のタイトル",
   "ChatSettingDialog.title.placeholder": "会話のタイトルを入力",
   "ChatSettingDialog.systemPrompt": "システムプロンプト",
-  "ChatSettingDialog.close": "閉じる",
   "ChatTextArea.placeholder": "AIにメッセージを入力...",
   "HeaderMenu.settingChat": "会話の設定",
   "HeaderMenu.removeChat": "この会話を削除",
@@ -25,7 +25,6 @@
   "SettingDialog.colorTheme.dark": "ダークモード",
   "SettingDialog.defaultSystemPrompt": "デフォルトのシステムプロンプト",
   "SettingDialog.defaultSystemPrompt.placeholder": "あなたはアシスタントAIです。",
-  "SettingDialog.close": "閉じる",
   "SideMenu.newChat": "新規チャット",
   "SideMenu.settings": "設定"
 }

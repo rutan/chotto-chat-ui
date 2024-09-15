@@ -5,7 +5,7 @@ import type { Chat } from '../entities';
 import { useChats } from '../hooks';
 import { cx } from '../libs';
 import { ChatList } from './ChatList';
-import { SettingDialog } from './SettingDialog';
+import { AppSettingDialog } from './settingDialogs';
 
 export type SideMenuProps = {
   className?: string;
@@ -56,7 +56,7 @@ export const SideMenu = ({ className, chat: currentChat, onNewChat, onSelectChat
           </ToolButton>
         </div>
       </div>
-      <SettingDialog isOpen={isShowSettingDialog} onClose={handleCloseSettingDialog} />
+      <AppSettingDialog isOpen={isShowSettingDialog} onClose={handleCloseSettingDialog} />
     </>
   );
 };
