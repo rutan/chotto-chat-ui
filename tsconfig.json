@@ -11,6 +11,7 @@
     "strict": true,
     "jsx": "react-jsx",
     "noImplicitReturns": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true
   }
 }

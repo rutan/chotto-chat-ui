@@ -10,4 +10,9 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
   },
+  resolve: {
+    alias: {
+      '@chotto-chat/shared': join(__dirname, '../_shared/src'),
+    },
+  },
 });

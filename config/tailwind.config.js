@@ -4,7 +4,7 @@ const __dirname = new URL('.', import.meta.url).pathname;
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [join(__dirname, '../shared/**/*.{js,ts,jsx,tsx}')],
+  content: [join(__dirname, '../apps/_shared/**/*.{js,ts,jsx,tsx}')],
   darkMode: 'class',
   theme: {
     colors: {

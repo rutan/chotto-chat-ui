@@ -1,0 +1,19 @@
+{
+  "name": "@chotto-chat/shared",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "src"],
+  "scripts": {
+    "build": "run-s clean build:*",
+    "build:tsc": "tsc",
+    "build:copy": "cpx \"src/**/*.css\" dist",
+    "dev": "run-p dev:*",
+    "dev:tsc": "tsc --watch",
+    "dev:copy": "cpx \"src/**/*.css\" dist --watch",
+    "clean": "rimraf ./dist"
+  },
+  "packageManager": "pnpm@8.15.8+sha256.691fe176eea9a8a80df20e4976f3dfb44a04841ceb885638fe2a26174f81e65e"
+}
