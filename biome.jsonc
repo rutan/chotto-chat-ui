@@ -6,7 +6,8 @@
       "dist",
 
       // pnpm
-      "pnpm-lock.yaml"
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml"
     ]
   },
   "vcs": {

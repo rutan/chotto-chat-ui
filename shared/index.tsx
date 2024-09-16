@@ -5,7 +5,7 @@ import { AppSettingsProvider, ChatsProvider, DatabaseProvider, SideMenuProvider 
 import { createDatabase } from './db';
 import { setupI18n } from './i18n';
 
-(async () => {
+export async function init() {
   const root = document.getElementById('root');
   if (!root) throw new Error('Root element not found');
 
@@ -27,4 +27,4 @@ import { setupI18n } from './i18n';
       </DatabaseProvider>
     </QueryClientProvider>,
   );
-})();
+}

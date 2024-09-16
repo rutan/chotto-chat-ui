@@ -3,15 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "vite preview",
-    "dev": "vite",
-    "build": "run-s lint clean build:*",
-    "build:vite": "cross-env NODE_ENV=production vite build",
+    "build": "turbo run build",
     "lint": "run-s lint:*",
     "lint:biome": "biome check ./",
-    "lint:tsc": "tsc --noEmit",
-    "format": "biome check --write ./",
-    "clean": "rimraf ./dist"
+    "lint:tsc": "turbo run lint",
+    "format": "biome check --write ./"
   },
   "dependencies": {
     "@headlessui/react": "^2.1.3",
@@ -32,6 +28,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
+    "@types/node": "^22.5.5",
     "@types/react": "^18.2.40",
     "@types/react-dom": "^18.2.17",
     "@types/react-syntax-highlighter": "^15.5.13",
@@ -43,6 +40,7 @@
     "postcss": "^8.4.41",
     "rimraf": "^5.0.5",
     "tailwindcss": "^3.4.10",
+    "turbo": "^2.1.2",
     "typescript": "^5.5.4",
     "vite": "^5.0.4"
   },

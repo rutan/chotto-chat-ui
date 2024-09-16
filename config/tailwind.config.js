@@ -1,6 +1,10 @@
+import { join } from 'node:path';
+
+const __dirname = new URL('.', import.meta.url).pathname;
+
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  content: [join(__dirname, '../shared/**/*.{js,ts,jsx,tsx}')],
   darkMode: 'class',
   theme: {
     colors: {
