@@ -23,5 +23,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Cache Turbo
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v.4.0.2
+        with:
+          path: .turbo
+          key: turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ github.job }}-${{ github.ref_name }}-
+
       - name: Run lint
         run: pnpm run lint
