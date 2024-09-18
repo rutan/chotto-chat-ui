@@ -118,7 +118,7 @@ export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu
   const handleAddChildMessage = useCallback(
     async (targetMessage: Message, child: OllamaMessage) => {
       await addChildMessage(targetMessage, child);
-      setIsAllowGenerate(true);
+      if (child.role === 'user') setIsAllowGenerate(true);
     },
     [addChildMessage],
   );
