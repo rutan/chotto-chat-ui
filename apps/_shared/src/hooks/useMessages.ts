@@ -180,7 +180,6 @@ export function useMessageGenerator({
         }
       } catch (e) {
         if (e instanceof Error && e.name === 'AbortError') {
-          console.log('Request aborted');
           onGenerateComplete?.(responseMessage);
           return;
         }
