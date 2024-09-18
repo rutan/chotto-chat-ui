@@ -16,7 +16,7 @@ export interface ModelSelectorProps {
 
 export const ModelSelector = ({ selectedModelName, className, disabled, onChange }: ModelSelectorProps) => {
   const { t } = useTranslation();
-  const { data: models = [], isLoading, isError, refetch } = useModels();
+  const { data: models = [], isFetching, isError, refetch } = useModels();
   const selectedModel = useMemo(
     () => models.find((model) => model.name === selectedModelName) ?? null,
     [models, selectedModelName],
@@ -30,7 +30,7 @@ export const ModelSelector = ({ selectedModelName, className, disabled, onChange
     onChange(selectedModel);
   }, [selectedModel, onChange]);
 
-  if (isLoading) {
+  if (isFetching) {
     return (
       <div className={cx('ModelSelector', 'flex items-center', className)}>
         <Spinner className="w-6 h-6 border-2 border-surface-dim border-t-primary" removeDefaultStyle />
