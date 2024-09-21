@@ -1,11 +1,13 @@
+import type { GlobalConfig } from '../contexts';
 import { type OllamaMessage, type OllamaModel, ollamaModelSchema } from '../entities';
 
 export interface ApiConfig {
   url: string;
+  fetchFns: GlobalConfig['fetchFns'];
 }
 
 export async function fetchListModels(config: ApiConfig): Promise<OllamaModel[]> {
-  const json = await fetch(`${config.url}/api/tags`).then((resp) => resp.json());
+  const json = await config.fetchFns.fetchJsonFn<{ models: unknown[] }>(`${config.url}/api/tags`);
   return json.models.map((model: unknown) => ollamaModelSchema.parse(model));
 }
 
@@ -17,7 +19,7 @@ export function postChatStream(
     signal?: AbortSignal;
   },
 ) {
-  return fetch(`${config.url}/api/chat`, {
+  return config.fetchFns.fetchReaderFn(`${config.url}/api/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -27,11 +29,5 @@ export function postChatStream(
       messages,
     }),
     signal: options?.signal,
-  })
-    .then((resp) => resp.body)
-    .then((body) => {
-      const reader = body?.getReader();
-      if (!reader) throw new Error('No reader');
-      return reader;
-    });
+  });
 }

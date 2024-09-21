@@ -17,6 +17,7 @@
   "ModelSelector.reload": "Reload models list",
   "SettingDialog.apiEndpoint": "API Endpoint",
   "SettingDialog.apiEndpoint.placeholder": "http://localhost:11434",
+  "SettingDialog.apiEndpoint.limited": "(*) Cannot be changed in the browser extension version.",
   "SettingDialog.language": "Language",
   "SettingDialog.language.auto": "(auto)",
   "SettingDialog.language.en": "English",

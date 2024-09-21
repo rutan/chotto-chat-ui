@@ -88,4 +88,8 @@ body,
 
 body {
   background: var(--surface-color);
+
+  /* reset font for Chrome Extension */
+  font-size: 100%;
+  font-family: inherit;
 }

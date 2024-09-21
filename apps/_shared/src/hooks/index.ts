@@ -2,6 +2,7 @@ export * from './useAppSettings';
 export * from './useChats';
 export * from './useDarkMode';
 export * from './useDatabase';
+export * from './useGlobalConfig';
 export * from './useLocale';
 export * from './useModels';
 export * from './useMessages';

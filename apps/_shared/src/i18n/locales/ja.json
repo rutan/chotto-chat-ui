@@ -17,6 +17,7 @@
   "ModelSelector.reload": "モデル一覧を再読込",
   "SettingDialog.apiEndpoint": "APIエンドポイント",
   "SettingDialog.apiEndpoint.placeholder": "http://localhost:11434",
+  "SettingDialog.apiEndpoint.limited": "※ブラウザ拡張版では変更できません",
   "SettingDialog.language": "言語設定",
   "SettingDialog.language.auto": "（自動設定）",
   "SettingDialog.colorTheme": "テーマ",

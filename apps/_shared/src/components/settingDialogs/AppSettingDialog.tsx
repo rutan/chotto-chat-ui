@@ -1,7 +1,7 @@
 import { DialogTitle, Select } from '@headlessui/react';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppSettings } from '../../hooks';
+import { useAppSettings, useGlobalConfig } from '../../hooks';
 import { BaseSettingDialog } from './BaseSettingDialog';
 import { SettingSection } from './SettingSection';
 
@@ -12,12 +12,17 @@ export interface SettingDialogProps {
 
 export const AppSettingDialog = ({ isOpen, onClose }: SettingDialogProps) => {
   const { t } = useTranslation();
+  const globalConfig = useGlobalConfig();
   const [appSettings, setAppSettings] = useAppSettings();
   const [tmpApiEndpoint, setTmpApiEndpoint] = useState(appSettings.apiEndpoint);
 
-  const handleChangeApiEndpoint = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setTmpApiEndpoint(e.target.value);
-  }, []);
+  const handleChangeApiEndpoint = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (globalConfig.limitedEndpoint) return;
+      setTmpApiEndpoint(e.target.value);
+    },
+    [globalConfig],
+  );
 
   const handleChangeLanguage = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -50,20 +55,22 @@ export const AppSettingDialog = ({ isOpen, onClose }: SettingDialogProps) => {
   return (
     <BaseSettingDialog isOpen={isOpen} onClose={handleClose}>
       <SettingSection>
-        <DialogTitle className="text-xl font-bold">{t('SettingDialog.apiEndpoint')}</DialogTitle>
+        <DialogTitle className="text-xl font-bold mb-2">{t('SettingDialog.apiEndpoint')}</DialogTitle>
         <input
           type="text"
-          className="w-full p-2 bg-surface-container text-on-surface my-4"
+          className="w-full p-2 bg-surface-container text-on-surface disabled:opacity-50"
           value={tmpApiEndpoint}
           placeholder={t('SettingDialog.apiEndpoint.placeholder')}
           onChange={handleChangeApiEndpoint}
+          disabled={globalConfig.limitedEndpoint}
         />
+        {globalConfig.limitedEndpoint && <p className="text-sm">{t('SettingDialog.apiEndpoint.limited')}</p>}
       </SettingSection>
 
       <SettingSection>
-        <DialogTitle className="text-xl font-bold">{t('SettingDialog.language')}</DialogTitle>
+        <DialogTitle className="text-xl font-bold mb-2">{t('SettingDialog.language')}</DialogTitle>
         <Select
-          className="w-full p-2 bg-surface-container text-on-surface my-4"
+          className="w-full p-2 bg-surface-container text-on-surface"
           value={appSettings.language}
           onChange={handleChangeLanguage}
         >
@@ -74,9 +81,9 @@ export const AppSettingDialog = ({ isOpen, onClose }: SettingDialogProps) => {
       </SettingSection>
 
       <SettingSection>
-        <DialogTitle className="text-xl font-bold">{t('SettingDialog.colorTheme')}</DialogTitle>
+        <DialogTitle className="text-xl font-bold mb-2">{t('SettingDialog.colorTheme')}</DialogTitle>
         <Select
-          className="w-full p-2 bg-surface-container text-on-surface my-4"
+          className="w-full p-2 bg-surface-container text-on-surface"
           value={appSettings.colorTheme}
           onChange={handleChangeDarkMode}
         >
@@ -87,9 +94,9 @@ export const AppSettingDialog = ({ isOpen, onClose }: SettingDialogProps) => {
       </SettingSection>
 
       <SettingSection>
-        <DialogTitle className="text-xl font-bold">{t('SettingDialog.defaultSystemPrompt')}</DialogTitle>
+        <DialogTitle className="text-xl font-bold mb-2">{t('SettingDialog.defaultSystemPrompt')}</DialogTitle>
         <textarea
-          className="w-full h-32 p-4 bg-surface-container text-on-surface resize-none my-4"
+          className="w-full h-32 p-4 bg-surface-container text-on-surface resize-none"
           value={appSettings.defaultSystemPrompt}
           onChange={handleChangeDefaultSystemPrompt}
           placeholder={t('SettingDialog.defaultSystemPrompt.placeholder')}

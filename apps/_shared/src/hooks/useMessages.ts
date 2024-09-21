@@ -6,6 +6,7 @@ import type { Chat, Message, OllamaMessage } from '../entities';
 import { postChatStream } from '../libs';
 import { useAppSettings } from './useAppSettings';
 import { useDatabase } from './useDatabase';
+import { useGlobalConfig } from './useGlobalConfig';
 
 function generateMessageQueryKey(chat: Chat) {
   return ['messages', chat.id];
@@ -110,6 +111,7 @@ export function useMessageGenerator({
   onGenerateComplete?: (message: OllamaMessage) => void;
   enabled?: boolean;
 }) {
+  const globalConfig = useGlobalConfig();
   const [appSettings] = useAppSettings();
   const [generatingMessage, setGeneratingMessage] = useState<OllamaMessage | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -147,6 +149,7 @@ export function useMessageGenerator({
       try {
         const reader = await postChatStream(
           {
+            fetchFns: globalConfig.fetchFns,
             url: appSettings.apiEndpoint,
           },
           chat.modelName,
@@ -163,7 +166,7 @@ export function useMessageGenerator({
         while (true) {
           const { done, value } = await reader.read();
           if (value) {
-            const text = decoder.decode(value);
+            const text = typeof value === 'string' ? value : decoder.decode(value);
             const lines = text.split('\n');
             for (const line of lines) {
               if (!line) continue;
@@ -191,7 +194,7 @@ export function useMessageGenerator({
         setGeneratingMessage(null);
       }
     })();
-  }, [enabled, appSettings, chat, messages, isGenerating, onGenerateComplete]);
+  }, [enabled, globalConfig, appSettings, chat, messages, isGenerating, onGenerateComplete]);
 
   return {
     generatingMessage,

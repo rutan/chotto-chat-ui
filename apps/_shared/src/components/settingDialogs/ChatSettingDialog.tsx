@@ -46,10 +46,10 @@ export const ChatSettingDialog = ({ chat, onUpdateChat, isOpen, onClose }: ChatS
   return (
     <BaseSettingDialog isOpen={isOpen} onClose={handleClose}>
       <SettingSection>
-        <DialogTitle className="text-xl font-bold">{t('ChatSettingDialog.title')}</DialogTitle>
+        <DialogTitle className="text-xl font-bold mb-2">{t('ChatSettingDialog.title')}</DialogTitle>
         <input
           type="text"
-          className="w-full p-2 bg-surface-container text-on-surface my-4"
+          className="w-full p-2 bg-surface-container text-on-surface"
           value={tmpTitle}
           placeholder={t('ChatSettingDialog.title.placeholder')}
           onChange={handleChangeTitle}
@@ -57,9 +57,9 @@ export const ChatSettingDialog = ({ chat, onUpdateChat, isOpen, onClose }: ChatS
       </SettingSection>
 
       <SettingSection>
-        <DialogTitle className="text-xl font-bold">{t('ChatSettingDialog.systemPrompt')}</DialogTitle>
+        <DialogTitle className="text-xl font-bold mb-2">{t('ChatSettingDialog.systemPrompt')}</DialogTitle>
         <textarea
-          className="w-full p-2 bg-surface-container text-on-surface my-4"
+          className="w-full p-2 bg-surface-container text-on-surface"
           value={tmpSystemPrompt}
           placeholder={appSettings.defaultSystemPrompt}
           onChange={handleChangeSystemPrompt}
