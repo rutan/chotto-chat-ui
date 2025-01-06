@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { MdChevronLeft, MdChevronRight, MdEdit } from 'react-icons/md';
+import { useTranslation } from 'react-i18next';
+import { MdChevronLeft, MdChevronRight, MdEdit, MdRefresh } from 'react-icons/md';
 import type { Message, OllamaMessage } from '../entities';
 import { isElementInViewport } from '../libs';
 import { ChatBalloon } from './ChatBalloon';
@@ -9,6 +10,7 @@ export interface ChatBalloonOfMessageHistoryProps {
   message: Message;
   parentMessage?: Message;
   onAddChildMessage?: (targetMessage: Message, child: OllamaMessage) => void;
+  onRegenerateAssistantMessage?: (targetMessage: Message, introMessage?: string) => void;
   onChangeBranch?: (targetMessage: Message, nextId: string) => void;
   disabled?: boolean;
 }
@@ -17,9 +19,12 @@ export const ChatBalloonOfMessageHistory = ({
   message,
   parentMessage,
   onAddChildMessage,
+  onRegenerateAssistantMessage,
   onChangeBranch,
   disabled,
 }: ChatBalloonOfMessageHistoryProps) => {
+  const { t } = useTranslation();
+
   const [isEdit, setIsEdit] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -46,6 +51,18 @@ export const ChatBalloonOfMessageHistory = ({
       }
     },
     [message, parentMessage, onAddChildMessage],
+  );
+
+  const handleRegenerateMessage = useCallback(
+    (introMessage = '') => {
+      setIsEdit(false);
+      if (message.role !== 'assistant') return;
+
+      if (parentMessage && onRegenerateAssistantMessage) {
+        onRegenerateAssistantMessage(parentMessage, introMessage);
+      }
+    },
+    [message, parentMessage, onRegenerateAssistantMessage],
   );
 
   const handleChangeBranch = useCallback(
@@ -91,20 +108,32 @@ export const ChatBalloonOfMessageHistory = ({
   if (message.role === 'system') return null;
 
   return (
-    <div className="ChatMessageHistoryBalloon" ref={containerRef}>
+    <div className="ChatMessageHistoryBalloon" data-message-id={message.id} data-role={message.role} ref={containerRef}>
       <ChatBalloon message={message} hiddenMessageBody={isShowEditView}>
         <div className="flex justify-between">
           {isShowEditView ? (
             <div className="w-full">
-              <ChatEditForm initMessage={message.content} onSend={handleSendMessage} onCancel={handleClickCancelEdit} />
+              <ChatEditForm
+                initMessage={message.content}
+                onSend={handleSendMessage}
+                onRegenerateAssistantMessage={message.role === 'assistant' ? handleRegenerateMessage : undefined}
+                onCancel={handleClickCancelEdit}
+              />
             </div>
           ) : (
             <>
-              {onAddChildMessage && (
-                <FooterMenuButton onClick={handleClickEdit} disabled={disabled}>
-                  <MdEdit title="Edit" />
-                </FooterMenuButton>
-              )}
+              <div className="flex items-center text-sm gap-1">
+                {onAddChildMessage && (
+                  <FooterMenuButton onClick={handleClickEdit} disabled={disabled}>
+                    <MdEdit title={t('ChatBalloonOfMessageHistory.edit')} />
+                  </FooterMenuButton>
+                )}
+                {message.role === 'assistant' && (
+                  <FooterMenuButton onClick={() => handleRegenerateMessage('')} disabled={disabled}>
+                    <MdRefresh title={t('ChatBalloonOfMessageHistory.regenerate')} />
+                  </FooterMenuButton>
+                )}
+              </div>
               {maxBranchIndex > 1 && (
                 <div className="flex items-center text-sm">
                   <ChangeBranchButton onClick={handleChangePrevBranch} disabled={disabled}>

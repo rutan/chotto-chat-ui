@@ -25,7 +25,14 @@ export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu
   const removeChatMutation = useRemoveChatMutation();
   const [isAllowGenerate, setIsAllowGenerate] = useState(false);
 
-  const { messages, addNewMessage, changeBranch, addChildMessage, refetch: refetchMessages } = useMessages(chat);
+  const {
+    messages,
+    addNewMessage,
+    newBranch,
+    changeBranch,
+    addChildMessage,
+    refetch: refetchMessages,
+  } = useMessages(chat);
 
   const handleGenerateComplete = useCallback(
     (message: OllamaMessage) => {
@@ -39,6 +46,7 @@ export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu
     isGenerating,
     generatingMessage,
     abort: cancelChat,
+    setIntroMessage,
   } = useMessageGenerator({
     chat,
     messages,
@@ -123,6 +131,15 @@ export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu
     [addChildMessage],
   );
 
+  const handleRegenerateAssistantMessage = useCallback(
+    async (targetMessage: Message, introMessage = '') => {
+      setIntroMessage(introMessage);
+      await newBranch(targetMessage);
+      setIsAllowGenerate(true);
+    },
+    [newBranch, setIntroMessage],
+  );
+
   const handleChangeBranch = useCallback(
     async (targetMessage: Message, newNextId: string) => {
       await changeBranch(targetMessage, newNextId);
@@ -167,6 +184,7 @@ export const ChatPanel = ({ className, chat, onChangeChat, onClickToggleSideMenu
         messages={messages}
         generatingMessage={generatingMessage}
         onAddChildMessage={handleAddChildMessage}
+        onRegenerateAssistantMessage={handleRegenerateAssistantMessage}
         onChangeBranch={handleChangeBranch}
         disabled={isGenerating}
       />

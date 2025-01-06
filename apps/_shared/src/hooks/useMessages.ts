@@ -79,6 +79,21 @@ export function useMessages(chat: Chat) {
     [data, addChildMessage],
   );
 
+  const newBranch = useCallback(
+    async (targetMessage: Message) => {
+      if (!data.allMessages.some((message) => message.id === targetMessage.id))
+        throw new Error('targetMessage not found');
+
+      updateMessagesMutation.mutate([
+        {
+          ...targetMessage,
+          currentNextId: undefined,
+        },
+      ]);
+    },
+    [data, updateMessagesMutation],
+  );
+
   const changeBranch = useCallback(
     async (targetMessage: Message, newNextId: string) => {
       if (!data.allMessages.some((message) => message.id === targetMessage.id))
@@ -96,6 +111,7 @@ export function useMessages(chat: Chat) {
     ...rest,
     addNewMessage,
     addChildMessage,
+    newBranch,
     changeBranch,
   };
 }
@@ -115,6 +131,7 @@ export function useMessageGenerator({
   const [appSettings] = useAppSettings();
   const [generatingMessage, setGeneratingMessage] = useState<OllamaMessage | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [introMessage, setIntroMessage] = useState('');
   const [generateError, setGenerateError] = useState<unknown | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -142,7 +159,8 @@ export function useMessageGenerator({
 
     setIsGenerating(true);
 
-    const responseMessage = { role: 'assistant' as const, content: '' };
+    const responseMessage = { role: 'assistant' as const, content: introMessage };
+    setIntroMessage('');
     setGeneratingMessage({ ...responseMessage });
 
     (async () => {
@@ -153,10 +171,19 @@ export function useMessageGenerator({
             url: appSettings.apiEndpoint,
           },
           chat.modelName,
-          messages.map((message) => ({
-            role: message.role,
-            content: message.role === 'system' ? chat.systemPrompt || appSettings.defaultSystemPrompt : message.content,
-          })),
+          [
+            ...messages.map((message) => ({
+              role: message.role,
+              content:
+                message.role === 'system' ? chat.systemPrompt || appSettings.defaultSystemPrompt : message.content,
+            })),
+            responseMessage.content
+              ? {
+                  role: responseMessage.role,
+                  content: responseMessage.content,
+                }
+              : undefined,
+          ].filter((message) => !!message),
           {
             signal: controller.signal,
           },
@@ -194,12 +221,13 @@ export function useMessageGenerator({
         setGeneratingMessage(null);
       }
     })();
-  }, [enabled, globalConfig, appSettings, chat, messages, isGenerating, onGenerateComplete]);
+  }, [enabled, globalConfig, appSettings, chat, messages, isGenerating, introMessage, onGenerateComplete]);
 
   return {
     generatingMessage,
     isGenerating,
     generateError,
+    setIntroMessage,
     abort,
   };
 }

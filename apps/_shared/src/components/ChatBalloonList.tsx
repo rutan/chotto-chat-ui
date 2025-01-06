@@ -9,6 +9,7 @@ export interface ChatBalloonListProps {
   messages: Message[];
   generatingMessage: OllamaMessage | null;
   onAddChildMessage: (targetMessage: Message, child: OllamaMessage) => void;
+  onRegenerateAssistantMessage: (targetMessage: Message, introMessage?: string) => void;
   onChangeBranch: (targetMessage: Message, nextId: string) => void;
   disabled: boolean;
 }
@@ -18,6 +19,7 @@ export const ChatBalloonList = ({
   messages,
   generatingMessage,
   onAddChildMessage,
+  onRegenerateAssistantMessage,
   onChangeBranch,
   disabled,
 }: ChatBalloonListProps) => {
@@ -44,6 +46,7 @@ export const ChatBalloonList = ({
             message={message}
             parentMessage={messages[index - 1]}
             onAddChildMessage={onAddChildMessage}
+            onRegenerateAssistantMessage={onRegenerateAssistantMessage}
             onChangeBranch={onChangeBranch}
             disabled={disabled}
           />

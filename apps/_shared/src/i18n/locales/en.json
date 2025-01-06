@@ -1,7 +1,10 @@
 {
   "BaseSettingDialog.close": "Close",
+  "ChatBalloonOfMessageHistory.edit": "Edit",
+  "ChatBalloonOfMessageHistory.regenerate": "Regenerate",
   "ChatEditForm.cancel": "Cancel",
   "ChatEditForm.submit": "Submit",
+  "ChatEditForm.regenerateWithIntro": "Generate this continuation",
   "ChatList.label.today": "Today",
   "ChatList.label.thisWeek": "7 Days",
   "ChatList.label.thisMonth": "30 Days",

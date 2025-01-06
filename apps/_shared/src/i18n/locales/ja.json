@@ -1,7 +1,10 @@
 {
   "BaseSettingDialog.close": "閉じる",
+  "ChatBalloonOfMessageHistory.edit": "編集",
+  "ChatBalloonOfMessageHistory.regenerate": "再生成",
   "ChatEditForm.cancel": "キャンセル",
   "ChatEditForm.submit": "送信",
+  "ChatEditForm.regenerateWithIntro": "この続きを生成する",
   "ChatList.label.today": "今日",
   "ChatList.label.thisWeek": "7日以内",
   "ChatList.label.thisMonth": "30日以内",
